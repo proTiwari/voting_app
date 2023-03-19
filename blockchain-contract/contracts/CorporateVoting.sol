@@ -23,6 +23,7 @@ contract CorporateVoting {
     UserDetailsWithCompanyId[] companies;
     mapping(uint => UserDetailsWithCompanyId) mappingOfCidToCompaniesDetails;
   }
+  
 
   mapping(address => User) users;
   Company[] companies;

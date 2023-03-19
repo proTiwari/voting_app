@@ -43,6 +43,8 @@ contract("CorporateVoting", async function (accounts) {
     expect(companies[0].isAdmin).to.equal(true)
     expect(companies[0].company.name).to.equal('c1')
 
+    // https://rfr.com/verify-add-employee?cid=1&email=skdhfkj@fs.com
+
     // test addEmployeeInCompany
     await instance.addEmployeeInCompany(companies[0].cid, 'emp1c1@email.com');
 
