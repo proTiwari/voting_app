@@ -1,137 +1,80 @@
-// SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
 contract CorporateVoting {
   constructor() public {
+
   }
 
-  struct Company {
-    string cin;
-    string name;
-    address[] employees;
-    address admin;
+  struct EventVote {
+    address userAddress; // user wallet address
+    string uid; // user id
+    uint voteOptionNum; // > 0 (option number from 1)
+    uint timestamp; // timestamp for vote
   }
 
-  struct UserDetailsWithCompanyId {
-    bool isAdmin;
-    uint cid;
-    string email;
+  struct VoteTotal {
+    mapping(uint => uint) totals; // mapping of option Num and total Votes
+    uint[] options; // options voted
   }
 
-  struct User {
-    string name;
-    UserDetailsWithCompanyId[] companies;
-    mapping(uint => UserDetailsWithCompanyId) mappingOfCidToCompaniesDetails;
-  }
-  
-
-  mapping(address => User) users;
-  Company[] companies;
-
-  struct UserCompanyState {
-    string name;
-    string email;
-    bool isAdmin;
-    uint cid;
+  struct Result {
+    uint winner;
+    OptionRes[] optionTotals;
   }
 
-  struct CompanyState {
-    string email;
-    bool isAdmin;
-    uint cid;
-    Company company;
+  struct OptionRes {
+    uint optionNum;
+    uint totalVotes;
   }
 
-  function stringToBytes32(string memory source) public pure returns (bytes32 result) {
-    // require(bytes(source).length <= 32); // causes error
-    // but string have to be max 32 chars
-    // https://ethereum.stackexchange.com/questions/9603/understanding-mload-assembly-function
-    // http://solidity.readthedocs.io/en/latest/assembly.html
-    assembly {
-      result := mload(add(source, 32))
-    }
-  }
+  mapping(string => VoteTotal) voteTotals; // map from event id to votes totals
+  mapping(string => EventVote[]) eventVotes;  // map from event id to event vote
 
-  function bytes32ToString(bytes32 _bytes32) public pure returns (string memory) {
-    uint8 i = 0;
-    while(i < 32 && _bytes32[i] != 0) {
-      i++;
-    }
-    bytes memory bytesArray = new bytes(i);
-    for (i = 0; i < 32 && _bytes32[i] != 0; i++) {
-      bytesArray[i] = _bytes32[i];
-    }
-    return string(bytesArray);
-  }
+  // get result
+  function getResults(string memory evid) public view returns (Result memory) {
+    Result memory res;
+    // compute winner and option totals
+    OptionRes[] memory optionTotals = new OptionRes[](voteTotals[evid].options.length);
+    uint winner = 0;
+    for(uint i = 0; i < voteTotals[evid].options.length; i++) {
+      if (winner == 0) {
+        winner = voteTotals[evid].options[i];
+      }
+      else {
+        if(voteTotals[evid].totals[winner] < voteTotals[evid].totals[voteTotals[evid].options[i]]) {
+          winner = voteTotals[evid].options[i];
+        }
+      }
 
-  function getUser() public view returns (string memory name, address add) {
-    return (users[msg.sender].name, msg.sender);
-  }
-
-  function setUser(string memory mName) public returns (string memory name, address add) {
-    users[msg.sender].name = mName;
-    return (mName, msg.sender);
-  }
-
-  function getAllEmployees(uint cid) public view returns (UserCompanyState[] memory) {
-    address[] memory employeeAdd = companies[cid].employees;
-    UserCompanyState[] memory employees = new UserCompanyState[](employeeAdd.length);
-
-    for (uint i = 0; i < employeeAdd.length; i++) {
-      users[employeeAdd[i]].mappingOfCidToCompaniesDetails[cid].email;
-      employees[i] = UserCompanyState(
-        users[employeeAdd[i]].name,
-        users[employeeAdd[i]].mappingOfCidToCompaniesDetails[cid].email,
-        users[employeeAdd[i]].mappingOfCidToCompaniesDetails[cid].isAdmin,
-        cid
+      // add each option result
+      optionTotals[i] = OptionRes(
+        voteTotals[evid].options[i],
+        voteTotals[evid].totals[voteTotals[evid].options[i]]
       );
     }
-    return employees;
+    res.winner = winner;
+    res.optionTotals = optionTotals;
+    return res;
   }
 
-  function getCompany(uint cid) public view returns (Company memory) {
-    return companies[cid];
+  // get all event votes
+  function getAllEventVotes(string memory evid) public view returns (EventVote[] memory) {
+    return eventVotes[evid];
   }
 
-  function getAllCompaniesAssociatedWithUser() public view returns (CompanyState[] memory) {
-    User storage u = users[msg.sender];
-    CompanyState[] memory mCompanies = new CompanyState[](u.companies.length);
+  // vote
+  function vote(string memory evid, string memory uid, uint option) public {
+    EventVote memory v;
+    v.uid = uid;
+    v.voteOptionNum = option;
+    v.userAddress = msg.sender;
+    v.timestamp = block.timestamp;
+    eventVotes[evid].push(v);
 
-    for (uint i = 0; i < u.companies.length; i++) {
-      Company memory c = companies[u.companies[i].cid];
-      mCompanies[i] = CompanyState(
-        u.companies[i].email,
-        u.companies[i].isAdmin,
-        u.companies[i].cid,
-        c
-      );
+    if(voteTotals[evid].totals[option] == 0) {
+      voteTotals[evid].options.push(option);
     }
-    return mCompanies;
-  }
+    voteTotals[evid].totals[option] = voteTotals[evid].totals[option] + 1;
 
-  // create new company with cin
-  function createNewCompany(string memory cname, string memory email, string memory cin) public {
-    Company memory c;
-    c.cin = cin;
-    c.name = cname;
-    c.admin = msg.sender;
-    companies.push(c);
-    companies[companies.length - 1].employees.push(msg.sender);
-    UserDetailsWithCompanyId memory userDetails = UserDetailsWithCompanyId(true, companies.length - 1, email);
-    users[msg.sender].companies.push(userDetails);
-    users[msg.sender].mappingOfCidToCompaniesDetails[companies.length - 1] = userDetails;
-  }
-
-  // create new company without cin
-  function createNewCompany(string memory cname, string memory email) public {
-    createNewCompany(cname, email, "");
-  }
-
-  // this function will be call when user will verify from the email
-  function addEmployeeInCompany(uint cid, string memory eemail) public {
-    companies[cid].employees.push(msg.sender);
-    UserDetailsWithCompanyId memory userDetails = UserDetailsWithCompanyId(false, cid, eemail);
-    users[msg.sender].companies.push(userDetails);
-    users[msg.sender].mappingOfCidToCompaniesDetails[cid] = userDetails;
   }
 }
