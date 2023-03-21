@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
-
+import '../services/code_generator.dart';
+import 'package:flutter_share/flutter_share.dart';
+import '../services/deeplink_service.dart';
 import '../services/contract_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +23,32 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     initFunction();
+    deeplink();
+  }
+
+  String? referLink = '';
+  void deeplink() async {
+    try {
+      final deepLinkRepo = await DeepLinkService.instance;
+      var referralCode = await deepLinkRepo?.referrerCode.value;
+      print(
+          "sddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd ${referralCode}");
+
+      //link for joining event
+      var id = "";
+
+      final referCode =
+          await CodeGenerator().generateCode('refer', id.toString());
+
+      referLink =
+          await DeepLinkService.instance?.createReferLink(referCode, "");
+
+      setState(() {
+        referLink;
+      });
+    } catch (e) {
+      print("$e");
+    }
   }
 
   double balance = 1.0;
@@ -122,12 +150,33 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         floatingActionButton: IconButton(
-          icon: const Icon(Icons.add),
-          onPressed: () {
-            FirebaseAuth.instance.signOut();
+          icon: const Icon(
+            Icons.add,
+            color: Colors.blue,
+          ),
+          onPressed: () async {
+            print("sdfwe");
+            if (referLink != '') {
+              print("sdfwe1");
+              await share();
+            }
+            print("sdfwe2");
           },
         ),
       ),
     );
+  }
+
+  Future<void> share() async {
+    print("sdfwe3");
+    try {
+      await FlutterShare.share(
+          title: 'E-Voting App',
+          text: 'completely secure blockchain voting platform',
+          linkUrl: '$referLink',
+          chooserTitle: '');
+    } catch (e) {
+      print(e);
+    }
   }
 }
