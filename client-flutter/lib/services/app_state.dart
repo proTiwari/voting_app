@@ -29,9 +29,15 @@ class AppState extends ChangeNotifier {
     _name = _value;
   }
 
-  String _key = "";
-  String get key => _key;
-  set key(String _value) {
-    _key = _value;
+  String _address = "";
+  String get address => _address;
+  set address(String _value) {
+    _address = _value;
+  }
+
+  String _email = "";
+  String get email => _email;
+  set email(String _value) {
+    _email = _value;
   }
 }

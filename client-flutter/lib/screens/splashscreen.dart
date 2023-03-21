@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:voting_app/screens/namescreen.dart';
+import 'package:voting_app/services/app_state.dart';
+import 'package:web3dart/web3dart.dart';
 
+import '../services/contract_service.dart';
 import 'homescreen.dart';
+import 'email_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,13 +20,62 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initFunction();
     Future.delayed(Duration(seconds: 3), () {
-      Get.to(NameScreen());
+      FirebaseAuth auth = FirebaseAuth.instance;
+
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          Get.to(EmailScreen());
+          print('User is currently signed out!');
+        } else {
+          Get.to(HomeScreen());
+          print('User is signed in!');
+        }
+      });
     });
+  }
+
+  double balance = 1.0;
+  String walletAddress = "";
+  initFunction() async {
+    print("iwoeifjwoeijf");
+
+    try {
+      //get wallet address
+      EthPrivateKey? wallet = await ContractService().getOrGenerateWallet();
+      walletAddress = wallet!.address.hex;
+      setState(() {
+        walletAddress;
+      });
+      AppState().address = walletAddress;
+      print("iwoeifjwoeijf");
+
+      // get balance
+      EtherAmount am = await ContractService().getbalance();
+      print("iwoeifjwoeijf :am $am");
+      balance = am.getValueInUnit(EtherUnit.ether);
+      print("iwoeifjwoeijf");
+      print(
+          "amount: ${am}; balance: ${balance}; walletAddress: ${wallet.address.hex}");
+      setState(() {
+        balance;
+        walletAddress;
+      });
+    } catch (e) {
+      print("iwoeifjwoeijf");
+      print("homescreen_error: ${e.toString()}");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        color: Colors.white,
+        child:Center(child: Image.asset("assets/voting.png"),)
+      ),
+    );
   }
 }
