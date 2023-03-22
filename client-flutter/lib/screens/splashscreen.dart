@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
       print("iwoeifjwoeijf");
 
       // get balance
-      EtherAmount am = await ContractService().getbalance();
+      EtherAmount am = await ContractService().getBalance();
       print("iwoeifjwoeijf :am $am");
       balance = am.getValueInUnit(EtherUnit.ether);
       print("iwoeifjwoeijf");

@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("iwoeifjwoeijf");
 
       // get balance
-      EtherAmount am = await ContractService().getbalance();
+      EtherAmount am = await ContractService().getBalance();
       print("iwoeifjwoeijf :am $am");
       balance = am.getValueInUnit(EtherUnit.ether);
       print("iwoeifjwoeijf");

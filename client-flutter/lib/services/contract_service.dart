@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:math'; //used for the random number generator
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,14 +17,14 @@ class ContractService {
     _web3client = Web3Client(Constants.RPC_URL, Client(), socketConnector: () {
       return IOWebSocketChannel.connect(Constants.WS_URL).cast<String>();
     });
-    String abiFile = await rootBundle.loadString('assets/Counter.json');
+    String abiFile = await rootBundle.loadString('assets/CorporateVoting.json');
     final abiJSON = jsonDecode(abiFile);
     _abiCode = jsonEncode(abiJSON['abi']);
     _contractAddress =
         EthereumAddress.fromHex(abiJSON['networks']['5777']['address']);
   }
 
-  getbalance() async {
+  getBalance() async {
     EthPrivateKey? wallet = await getOrGenerateWallet();
     return Web3Client(Constants.RPC_URL, Client()).getBalance(wallet!.address);
   }
@@ -37,12 +36,9 @@ class ContractService {
   }
 
   Future<EthPrivateKey?> getOrGenerateWallet() async {
-    print("wijefowijeoifjwoiefwo");
     try {
       var prefs = await SharedPreferences.getInstance();
-      print("wijefowijeoifjwoiefwo 2");
       dynamic privateKey = prefs.getString('privatekey');
-      print("privatekey: ${privateKey}");
 
       if (privateKey == null) {
         EthPrivateKey wallet = _generateWallet();
@@ -61,6 +57,47 @@ class ContractService {
 
   EthPrivateKey _getCredentialsFromPrivateKey(String privateKey) {
     return EthPrivateKey.fromHex(privateKey);
+  }
+
+  Future<String> getAddress() async {
+    EthPrivateKey? wallet = await getOrGenerateWallet();
+    return wallet!.address.hex;
+  }
+
+  // vote in contract
+  Future<String> vote(String eventId, String uid, String optionNum) async {
+    EthPrivateKey? wallet = await getOrGenerateWallet();
+    DeployedContract contract = DeployedContract(
+        ContractAbi.fromJson(_abiCode, "CorporateVoting"), _contractAddress);
+    final vote = contract.function("vote");
+    final result = await _web3client.sendTransaction(
+        wallet!,
+        Transaction.callContract(
+            contract: contract, function: vote, parameters: [eventId, uid, optionNum]),
+        fetchChainIdFromNetworkId: true);
+    return result;
+  }
+
+  // call method getAllEventVotes from contract given eventId
+  Future<List<dynamic>> getAllEventVotes(String eventId) async {
+    DeployedContract contract = DeployedContract(
+        ContractAbi.fromJson(_abiCode, "CorporateVoting"), _contractAddress);
+    final getAllEventVotes = contract.function("getAllEventVotes");
+    final result = await _web3client.call(
+        contract: contract,
+        function: getAllEventVotes,
+        params: [eventId]);
+    return result;
+  }
+
+  // call method getResults from contract from given eventId
+  Future<List<dynamic>> getVoteResults(String eventId) async {
+    DeployedContract contract = DeployedContract(
+        ContractAbi.fromJson(_abiCode, "CorporateVoting"), _contractAddress);
+    final getResults = contract.function("getResults");
+    final result = await _web3client.call(
+        contract: contract, function: getResults, params: [eventId]);
+    return result;
   }
 }
 
