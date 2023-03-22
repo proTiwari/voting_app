@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/objects/AppUser.dart';
 import 'package:voting_app/objects/Company.dart';
+import 'package:voting_app/objects/Invite.dart';
 import 'package:voting_app/objects/PollEvent.dart';
 import '../objects/ElectionEvent.dart';
 
@@ -16,17 +17,32 @@ class FirestoreFunctions {
 
   // Create a new company in the database
   Future<void> createCompany(Company company) async {
-    await Company.collection.doc(company.cid).set(company);
+    final batch = firestore.batch();
+    batch.set(Company.collection.doc(company.cid), company);
+    batch.update(AppUser.collection.doc(uid), {
+      'companies': FieldValue.arrayUnion([company.cid])
+    });
+    await batch.commit();
   }
 
   // Create a new event with type poll in the database
   Future<void> createPollEvent(PollEvent event) async {
-    await PollEvent.collection.doc(event.evid).set(event);
+    final batch = firestore.batch();
+    batch.set(PollEvent.collection.doc(event.evid), event);
+    batch.update(Company.collection.doc(event.cid), {
+      'events': FieldValue.arrayUnion([event.evid])
+    });
+    await batch.commit();
   }
 
   // Create a new event with type election in the database
   Future<void> createElectionEvent(ElectionEvent event) async {
-    await ElectionEvent.collection.doc(event.evid).set(event);
+    final batch = firestore.batch();
+    batch.set(ElectionEvent.collection.doc(event.evid), event);
+    batch.update(Company.collection.doc(event.cid), {
+      'events': FieldValue.arrayUnion([event.evid])
+    });
+    await batch.commit();
   }
 
   // get all active events from the collection events
@@ -70,7 +86,7 @@ class FirestoreFunctions {
   // get all companies from the collection companies where uid is equal to firebase user uid
   Future<List<Company>> getCompanies() async {
     List<Company> companies = [];
-    var snapshot = await Company.collection.where('uid', isEqualTo: uid).get();
+    var snapshot = await Company.collection.where('users', arrayContains: uid).get();
     for (var doc in snapshot.docs) {
       companies.add(Company.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
     }
@@ -100,5 +116,66 @@ class FirestoreFunctions {
   Future<AppUser?> getUser() async {
     var snapshot = await AppUser.collection.doc(uid).get();
     return snapshot.data();
+  }
+
+  // function to invite a user to a company
+  Future<void> inviteUser(String companyEmail, String cid) async {
+    if(uid == null) return;
+    final docRef = Invite.collection.doc();
+    final invite = Invite(
+      companyEmail: companyEmail,
+      cid: cid,
+      uid: uid!,
+      inviteId: docRef.id,
+      creationTimestamp: Timestamp.now(),
+      actionTimestamp: null,
+      status: InviteStatus.pending
+    );
+    await docRef.set(invite);
+
+    // TODO: send email
+    /*final email = Email(
+      body: 'You have been invited to join a company on the app. Click the link below to accept the invite. \n\n'
+          'https://voting-app-9f3e5.web.app/invite/${invite.inviteId}',
+      subject: 'Invite to join a company',
+      recipients: [companyEmail],
+      isHTML: false,
+    );*/
+  }
+
+  // function to accept an invite
+  Future<void> acceptInvite(Invite invite) async {
+    if(uid == null) return;
+    final batch = firestore.batch();
+    batch.update(Invite.collection.doc(invite.inviteId), {
+      'status': InviteStatus.accepted.name,
+      'actionTimestamp': Timestamp.now()
+    });
+    batch.update(AppUser.collection.doc(uid), {
+      'companies': FieldValue.arrayUnion([invite.cid])
+    });
+    batch.update(Company.collection.doc(invite.cid), {
+      'users': FieldValue.arrayUnion([uid])
+    });
+    await batch.commit();
+  }
+
+  // function to decline an invite
+  Future<void> declineInvite(Invite invite) async {
+    if(uid == null) return;
+    await Invite.collection.doc(invite.inviteId).update({
+      'status': InviteStatus.rejected.name,
+      'actionTimestamp': Timestamp.now()
+    });
+  }
+
+  // function to get all invites from the collection invites where the company email is equal to the given company email
+  Future<List<Invite>> getMyInvites() async {
+    List<Invite> invites = [];
+    var snapshot = await Invite.collection.where('uid', isEqualTo: uid).get();
+    for (var doc in snapshot.docs) {
+      invites.add(Invite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
+    }
+    return invites;
   }
 }
