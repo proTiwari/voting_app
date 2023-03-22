@@ -5,6 +5,7 @@ import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/web3dart.dart';
 
 import '../services/contract_service.dart';
+import '../widgets/bottom_nav_bar.dart';
 import 'homescreen.dart';
 import 'email_screen.dart';
 
@@ -22,14 +23,13 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     initFunction();
     Future.delayed(Duration(seconds: 3), () {
-      FirebaseAuth auth = FirebaseAuth.instance;
 
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
           Get.to(EmailScreen());
           print('User is currently signed out!');
         } else {
-          Get.to(HomeScreen());
+          Get.to(CustomBottomNavigation());
           print('User is signed in!');
         }
       });
