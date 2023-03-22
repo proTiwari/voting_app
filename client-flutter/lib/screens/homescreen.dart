@@ -90,40 +90,40 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async {
-          showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text("Exit"),
-                  content: const Text("Are you sure you want to Exit?"),
-                  actions: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.cancel,
-                        color: Colors.red,
-                      ),
+      onWillPop: () async {
+        showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Exit"),
+                content: const Text("Are you sure you want to Exit?"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Colors.red,
                     ),
-                    IconButton(
-                      onPressed: () async {
-                        exit(0);
-                      },
-                      icon: const Icon(
-                        Icons.done,
-                        color: Colors.green,
-                      ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      exit(0);
+                    },
+                    icon: const Icon(
+                      Icons.done,
+                      color: Colors.green,
                     ),
-                  ],
-                );
-              });
-          return false;
-        },
-        child: SafeArea(
-            child: Scaffold(
+                  ),
+                ],
+              );
+            });
+        return false;
+      },
+      child: SafeArea(
+        child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Column(children: [
@@ -304,25 +304,43 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                     },
                   ))
-            ]
-
-                // floatingActionButton: IconButton(
-                //   icon: const Icon(
-                //     Icons.add,
-                //     color: Colors.blue,
-                //   ),
-                //   onPressed: () async {
-                //     print("sdfwe");
-                //     if (referLink != '') {
-                //       print("sdfwe1");
-                //       await share();
-                //     }
-                //     print("sdfwe2");
-                //   },
-                // ),
-                ),
+            ]),
           ),
-        )));
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.fromLTRB(31.0,31,51,44),
+            child: IconButton(
+              icon: Stack(
+                children: [
+                  const Icon(
+                    Icons.circle,
+                    color: Color.fromARGB(220, 255, 255, 255),
+                    size: 80,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(25.0),
+                    child: Center(
+                      child: const Icon(
+                        Icons.add,
+                        color: Color.fromARGB(220, 0, 0, 0),
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              onPressed: () async {
+                print("sdfwe");
+                if (referLink != '') {
+                  print("sdfwe1");
+                  await share();
+                }
+                print("sdfwe2");
+              },
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> share() async {
