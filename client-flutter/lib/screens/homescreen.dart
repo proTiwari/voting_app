@@ -307,16 +307,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ]),
           ),
           floatingActionButton: GestureDetector(
-            onTap: () async{
-               print("sdfwe");
-                  if (referLink != '') {
-                    print("sdfwe1");
-                    await share();
-                  }
-                  print("sdfwe2");
+            onTap: () async {
+              print("sdfwe");
+              if (referLink != '') {
+                print("sdfwe1");
+                await share();
+              }
+              print("sdfwe2");
             },
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(31.0,31,51,44),
+              padding: const EdgeInsets.fromLTRB(1.0, 1, 41, 44),
               child: IconButton(
                 icon: Stack(
                   children: [
@@ -338,7 +338,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 onPressed: () async {
-                 
+                  print("sdfwe");
+                  if (referLink != '') {
+                    print("sdfwe1");
+                    await share();
+                  }
+                  print("sdfwe2");
                 },
               ),
             ),
