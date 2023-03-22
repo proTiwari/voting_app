@@ -1,31 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:voting_app/screens/events.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../services/firestore_functions.dart';
 
-class Companies extends StatefulWidget {
-  const Companies({super.key});
+class CompanyEvents extends StatefulWidget {
+  String? cid;
+  CompanyEvents({super.key, this.cid});
 
   @override
-  State<Companies> createState() => _CompaniesState();
+  State<CompanyEvents> createState() => _CompanyEventsState();
 }
 
-class _CompaniesState extends State<Companies> {
+class _CompanyEventsState extends State<CompanyEvents> {
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    getCompanyList();
+    getAllCompanyEvents();
   }
 
-  var companies = [];
+  var events = [];
 
-  getCompanyList() async {
-    companies = await FirestoreFunctions().getCompanies();
+  getAllCompanyEvents() async {
+    events = await FirestoreFunctions().getAllCompanyEvents(widget.cid!);
     print("iwjeofwjioe");
-    print(companies);
+    print(events);
   }
 
   @override
@@ -53,23 +52,18 @@ class _CompaniesState extends State<Companies> {
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
                 scrollDirection: Axis.vertical,
-                itemCount: companies.length,
+                itemCount: events.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to(CompanyEvents(cid:"cid"));
-                    },
-                    child: Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(220, 59, 58, 58),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
+                  return Align(
+                    alignment: AlignmentDirectional(-0.05, -0.8),
+                    child: Padding(
+                      padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(220, 59, 58, 58),
+                          borderRadius: BorderRadius.circular(18),
                         ),
                       ),
                     ),

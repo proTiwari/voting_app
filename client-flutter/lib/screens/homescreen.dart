@@ -12,6 +12,7 @@ import '../services/code_generator.dart';
 import 'package:flutter_share/flutter_share.dart';
 import '../services/deeplink_service.dart';
 import '../services/contract_service.dart';
+import '../services/firestore_functions.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -89,49 +90,50 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-        onWillPop: () async {
-          showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: const Text("Exit"),
-                  content: const Text("Are you sure you want to Exit?"),
-                  actions: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: const Icon(
-                        Icons.cancel,
-                        color: Colors.red,
-                      ),
+      onWillPop: () async {
+        showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Exit"),
+                content: const Text("Are you sure you want to Exit?"),
+                actions: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.cancel,
+                      color: Colors.red,
                     ),
-                    IconButton(
-                      onPressed: () async {
-                        exit(0);
-                      },
-                      icon: const Icon(
-                        Icons.done,
-                        color: Colors.green,
-                      ),
+                  ),
+                  IconButton(
+                    onPressed: () async {
+                      exit(0);
+                    },
+                    icon: const Icon(
+                      Icons.done,
+                      color: Colors.green,
                     ),
-                  ],
-                );
-              });
-          return false;
-        },
+                  ),
+                ],
+              );
+            });
+        return false;
+      },
+      child: SafeArea(
         child: Scaffold(
           body: Padding(
-            padding: const EdgeInsets.only(top: 50.0),
+            padding: const EdgeInsets.only(top: 10.0),
             child: Column(children: [
               Align(
                 alignment: AlignmentDirectional(-0.05, -0.8),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
+                  width: MediaQuery.of(context).size.width * 0.93,
                   height: 190,
                   decoration: BoxDecoration(
-                    color: Color(0xDC4B39EF),
+                    color: Color.fromARGB(220, 59, 58, 58),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Column(
@@ -164,10 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Container(
                           height: 120,
-                          width: MediaQuery.of(context).size.width*0.9,
+                          width: MediaQuery.of(context).size.width * 0.9,
                           child: Stack(
                             children: [
-                              
                               InkWell(
                                 onTap: () async {
                                   print("wiefw");
@@ -184,7 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     readOnly: true,
                                     obscureText: false,
                                     decoration: InputDecoration(
-                                      hintText: 'address:\n${AppState().address}',
+                                      hintText:
+                                          'address:\n${AppState().address}',
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .bodyText2
                                           .override(
@@ -279,117 +281,76 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Container(
-                height: 360,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
+                  height: 360,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: 5,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Align(
+                        alignment: AlignmentDirectional(-0.05, -0.8),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.91,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(220, 59, 58, 58),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ))
+            ]),
+          ),
+          floatingActionButton: GestureDetector(
+            onTap: () async {
+              print("sdfwe");
+              if (referLink != '') {
+                print("sdfwe1");
+                await share();
+              }
+              print("sdfwe2");
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(1.0, 1, 41, 44),
+              child: IconButton(
+                icon: Stack(
                   children: [
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
+                    const Icon(
+                      Icons.circle,
+                      color: Color.fromARGB(220, 255, 255, 255),
+                      size: 80,
                     ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Center(
+                        child: const Icon(
+                          Icons.add,
+                          color: Color.fromARGB(220, 0, 0, 0),
+                          size: 30,
                         ),
                       ),
                     ),
                   ],
                 ),
+                onPressed: () async {
+                  print("sdfwe");
+                  if (referLink != '') {
+                    print("sdfwe1");
+                    await share();
+                  }
+                  print("sdfwe2");
+                },
               ),
-            ]),
-
-            // floatingActionButton: IconButton(
-            //   icon: const Icon(
-            //     Icons.add,
-            //     color: Colors.blue,
-            //   ),
-            //   onPressed: () async {
-            //     print("sdfwe");
-            //     if (referLink != '') {
-            //       print("sdfwe1");
-            //       await share();
-            //     }
-            //     print("sdfwe2");
-            //   },
-            // ),
+            ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Future<void> share() async {
