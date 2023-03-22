@@ -306,36 +306,41 @@ class _HomeScreenState extends State<HomeScreen> {
                   ))
             ]),
           ),
-          floatingActionButton: Padding(
-            padding: const EdgeInsets.fromLTRB(31.0,31,51,44),
-            child: IconButton(
-              icon: Stack(
-                children: [
-                  const Icon(
-                    Icons.circle,
-                    color: Color.fromARGB(220, 255, 255, 255),
-                    size: 80,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(25.0),
-                    child: Center(
-                      child: const Icon(
-                        Icons.add,
-                        color: Color.fromARGB(220, 0, 0, 0),
-                        size: 30,
+          floatingActionButton: GestureDetector(
+            onTap: () async{
+               print("sdfwe");
+                  if (referLink != '') {
+                    print("sdfwe1");
+                    await share();
+                  }
+                  print("sdfwe2");
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(31.0,31,51,44),
+              child: IconButton(
+                icon: Stack(
+                  children: [
+                    const Icon(
+                      Icons.circle,
+                      color: Color.fromARGB(220, 255, 255, 255),
+                      size: 80,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(25.0),
+                      child: Center(
+                        child: const Icon(
+                          Icons.add,
+                          color: Color.fromARGB(220, 0, 0, 0),
+                          size: 30,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
+                onPressed: () async {
+                 
+                },
               ),
-              onPressed: () async {
-                print("sdfwe");
-                if (referLink != '') {
-                  print("sdfwe1");
-                  await share();
-                }
-                print("sdfwe2");
-              },
             ),
           ),
         ),
