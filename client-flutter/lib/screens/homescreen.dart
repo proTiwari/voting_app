@@ -12,6 +12,7 @@ import '../services/code_generator.dart';
 import 'package:flutter_share/flutter_share.dart';
 import '../services/deeplink_service.dart';
 import '../services/contract_service.dart';
+import '../services/firestore_functions.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
     initFunction();
     deeplink();
   }
+
 
   String? referLink = '';
   void deeplink() async {
@@ -164,10 +166,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                         child: Container(
                           height: 120,
-                          width: MediaQuery.of(context).size.width*0.9,
+                          width: MediaQuery.of(context).size.width * 0.9,
                           child: Stack(
                             children: [
-                              
                               InkWell(
                                 onTap: () async {
                                   print("wiefw");
@@ -184,7 +185,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     readOnly: true,
                                     obscureText: false,
                                     decoration: InputDecoration(
-                                      hintText: 'address:\n${AppState().address}',
+                                      hintText:
+                                          'address:\n${AppState().address}',
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .bodyText2
                                           .override(
