@@ -5,6 +5,8 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:connectivity_wrapper/connectivity_wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/services/app_state.dart';
+import 'package:voting_app/services/firestore_functions.dart';
+import '../objects/AppUser.dart';
 import '../widgets/input_field.dart';
 
 class Signup extends StatefulWidget {
@@ -107,16 +109,14 @@ class _SignupState extends State<Signup> {
       if (_nameController.text.length > 3) {
         var _authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .set({
-          "name": _nameController.text,
-          "email": AppState().email,
-          "creationTimestamp":DateTime.now(),
-          "address":AppState().address,
-          "companies":[]
-        });
+        AppUser appUser = AppUser(
+            name: _nameController.text,
+            email: email,
+            creationTimestamp: Timestamp.now(),
+            address: AppState().address,
+            companies: [],
+            uid: _authResult.user!.uid);
+        await FirestoreFunctions().createUser(appUser);
       } else {
         Get.snackbar('Error!', 'name is too small');
       }
