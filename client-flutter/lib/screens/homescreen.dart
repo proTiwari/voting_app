@@ -30,7 +30,6 @@ class _HomeScreenState extends State<HomeScreen> {
     deeplink();
   }
 
-
   String? referLink = '';
   void deeplink() async {
     try {
@@ -123,17 +122,18 @@ class _HomeScreenState extends State<HomeScreen> {
               });
           return false;
         },
-        child: Scaffold(
+        child: SafeArea(
+            child: Scaffold(
           body: Padding(
-            padding: const EdgeInsets.only(top: 50.0),
+            padding: const EdgeInsets.only(top: 10.0),
             child: Column(children: [
               Align(
                 alignment: AlignmentDirectional(-0.05, -0.8),
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.9,
+                  width: MediaQuery.of(context).size.width * 0.93,
                   height: 190,
                   decoration: BoxDecoration(
-                    color: Color(0xDC4B39EF),
+                    color: Color.fromARGB(220, 59, 58, 58),
                     borderRadius: BorderRadius.circular(25),
                   ),
                   child: Column(
@@ -281,117 +281,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               Container(
-                height: 360,
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  children: [
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
+                  height: 360,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: 5,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Align(
+                        alignment: AlignmentDirectional(-0.05, -0.8),
+                        child: Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.91,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(220, 59, 58, 58),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color(0xDC4B39EF),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ]),
+                      );
+                    },
+                  ))
+            ]
 
-            // floatingActionButton: IconButton(
-            //   icon: const Icon(
-            //     Icons.add,
-            //     color: Colors.blue,
-            //   ),
-            //   onPressed: () async {
-            //     print("sdfwe");
-            //     if (referLink != '') {
-            //       print("sdfwe1");
-            //       await share();
-            //     }
-            //     print("sdfwe2");
-            //   },
-            // ),
+                // floatingActionButton: IconButton(
+                //   icon: const Icon(
+                //     Icons.add,
+                //     color: Colors.blue,
+                //   ),
+                //   onPressed: () async {
+                //     print("sdfwe");
+                //     if (referLink != '') {
+                //       print("sdfwe1");
+                //       await share();
+                //     }
+                //     print("sdfwe2");
+                //   },
+                // ),
+                ),
           ),
-        ));
+        )));
   }
 
   Future<void> share() async {

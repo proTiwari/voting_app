@@ -39,6 +39,11 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
         return false;
       },
       child: Scaffold(
+        appBar: AppBar(
+          toolbarHeight: 0,
+          leading: null,
+          backgroundColor:Color.fromARGB(220, 59, 58, 58),
+        ),
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         body: pages[pageIndex],
         bottomNavigationBar: Container(
@@ -61,7 +66,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                   icon: Column(
                     children: [
                       Image.asset(
-                        "assets/home.png",
+                        "assets/home.png",color: Color.fromARGB(220, 59, 58, 58),
                         height: 30,
                       ),
                       Text(
@@ -86,7 +91,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                   icon: Column(
                     children: [
                       Image.asset(
-                        "assets/group.png",
+                        "assets/group.png",color: Color.fromARGB(220, 59, 58, 58),
                         height: 30,
                       ),
                       Text(
@@ -111,7 +116,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
                   icon: Column(
                     children: [
                       Image.asset(
-                        "assets/user.png",
+                        "assets/user.png",color: Color.fromARGB(220, 59, 58, 58),
                         height: 30,
                       ),
                       Text(

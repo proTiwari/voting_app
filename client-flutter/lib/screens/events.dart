@@ -62,7 +62,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
                         width: MediaQuery.of(context).size.width * 0.9,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: Color(0xDC4B39EF),
+                          color: Color.fromARGB(220, 59, 58, 58),
                           borderRadius: BorderRadius.circular(18),
                         ),
                       ),
