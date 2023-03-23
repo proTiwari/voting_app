@@ -42,8 +42,9 @@ class _SplashScreenState extends State<SplashScreen> {
     print("iwoeifjwoeijf");
 
     try {
+      ContractService contractService = await ContractService.build();
       //get wallet address
-      EthPrivateKey? wallet = await ContractService().getOrGenerateWallet();
+      EthPrivateKey? wallet = await contractService.getOrGenerateWallet();
       walletAddress = wallet!.address.hex;
       setState(() {
         walletAddress;
@@ -52,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
       print("iwoeifjwoeijf");
 
       // get balance
-      EtherAmount am = await ContractService().getBalance();
+      EtherAmount am = await contractService.getBalance();
       print("iwoeifjwoeijf :am $am");
       balance = am.getValueInUnit(EtherUnit.ether);
       print("iwoeifjwoeijf");

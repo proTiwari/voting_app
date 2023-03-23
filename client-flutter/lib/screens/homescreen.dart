@@ -61,8 +61,9 @@ class _HomeScreenState extends State<HomeScreen> {
     print("iwoeifjwoeijf");
 
     try {
+      ContractService contractService = await ContractService.build();
       //get wallet address
-      EthPrivateKey? wallet = await ContractService().getOrGenerateWallet();
+      EthPrivateKey? wallet = await contractService.getOrGenerateWallet();
       walletAddress = wallet!.address.hex;
       setState(() {
         walletAddress;
@@ -71,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("iwoeifjwoeijf");
 
       // get balance
-      EtherAmount am = await ContractService().getBalance();
+      EtherAmount am = await contractService.getBalance();
       print("iwoeifjwoeijf :am $am");
       balance = am.getValueInUnit(EtherUnit.ether);
       print("iwoeifjwoeijf");

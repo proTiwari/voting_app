@@ -13,6 +13,8 @@ class ContractService {
   late final EthereumAddress _contractAddress;
   late final String _abiCode;
 
+  ContractService._();
+
   Future<void> getAbi() async {
     _web3client = Web3Client(Constants.RPC_URL, Client(), socketConnector: () {
       return IOWebSocketChannel.connect(Constants.WS_URL).cast<String>();
@@ -20,8 +22,7 @@ class ContractService {
     String abiFile = await rootBundle.loadString('assets/CorporateVoting.json');
     final abiJSON = jsonDecode(abiFile);
     _abiCode = jsonEncode(abiJSON['abi']);
-    _contractAddress =
-        EthereumAddress.fromHex(abiJSON['networks']['5777']['address']);
+    _contractAddress = EthereumAddress.fromHex(abiJSON['networks']['11155111']['address']);
   }
 
   getBalance() async {
@@ -98,6 +99,12 @@ class ContractService {
     final result = await _web3client.call(
         contract: contract, function: getResults, params: [eventId]);
     return result;
+  }
+
+  static Future<ContractService> build() async {
+    ContractService contractService = ContractService._();
+    await contractService.getAbi();
+    return contractService;
   }
 }
 

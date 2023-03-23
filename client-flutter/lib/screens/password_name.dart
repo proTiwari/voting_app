@@ -5,6 +5,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:connectivity_wrapper/connectivity_wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/services/app_state.dart';
+import 'package:voting_app/services/contract_service.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import '../objects/AppUser.dart';
 import '../widgets/input_field.dart';
@@ -109,11 +110,13 @@ class _SignupState extends State<Signup> {
       if (_nameController.text.length > 3) {
         var _authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
+        ContractService contractService = await ContractService.build();
+        String address = await contractService.getAddress();
         AppUser appUser = AppUser(
             name: _nameController.text,
             email: email,
             creationTimestamp: Timestamp.now(),
-            address: AppState().address,
+            address: address,
             companies: [],
             uid: _authResult.user!.uid);
         await FirestoreFunctions().createUser(appUser);
