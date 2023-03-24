@@ -1,3 +1,4 @@
+import 'package:date_format/date_format.dart';
 import 'package:flutter/material.dart';
 import 'package:voting_app/widgets/company_members_list.dart';
 import '../objects/Company.dart';
@@ -54,7 +55,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         ),
         body: TabBarView(
           children: <Widget>[
-            CompanyEvents(cid: widget.company.cid),
+            CompanyEvents(cid: widget.company.cid, companydata: widget.company,),
             CompanyMembers(company: widget.company),
           ],
         ),

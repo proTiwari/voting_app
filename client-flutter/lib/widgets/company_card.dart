@@ -80,7 +80,7 @@ class CompanyCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.navigate_next),
               onPressed: () {
-                Get.to(CompanyEvents(companydata: _companySummary,));
+                Get.to(CompanyEvents(companydata: _companySummary, cid: _companySummary.cid,));
               },
             )
           ],

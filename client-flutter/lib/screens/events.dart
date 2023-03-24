@@ -13,7 +13,7 @@ class CompanyEvents extends StatefulWidget {
   Company companydata;
   CompanyEvents({
     super.key,
-    required this.companydata,
+    required this.companydata, required String cid,
   });
 
   @override

@@ -8,7 +8,7 @@ import '../objects/Company.dart';
 import '../objects/ElectionEvent.dart';
 import '../objects/PollEvent.dart';
 import '../services/firestore_functions.dart';
-import '../widgets/event_screen.dart';
+import '../widgets/create_event_screen.dart';
 
 class CompanyMembers extends StatefulWidget {
   final Company company;
