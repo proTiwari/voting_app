@@ -53,11 +53,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
           ),
         ],
       ),
-      body: <Widget>[
-        HomeScreen(),
-        const Companies(),
-        const Me()
-      ][currentPageIndex],
+      body: <Widget>[HomeScreen(), const Companies(), Me()][currentPageIndex],
     );
   }
 }
