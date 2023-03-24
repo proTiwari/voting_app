@@ -8,11 +8,13 @@ class CompanySummary {
   final String cid;
   final String cin;
   final String name;
+  final String admin;
 
   CompanySummary({
     required this.cid,
     required this.cin,
     required this.name,
+    required this.admin,
   });
 
   factory CompanySummary.fromFirestore(
@@ -24,6 +26,7 @@ class CompanySummary {
       cid: data['cid'] ?? '',
       cin: data['cin'] ?? '',
       name: data['name'] ?? '',
+      admin: data['admin'] ?? '',
     );
   }
 
@@ -33,7 +36,17 @@ class CompanySummary {
       'cid': cid,
       'cin': cin,
       'name': name,
+      'admin': admin,
     };
+  }
+
+  static CompanySummary fromMap(Map<String, dynamic> map) {
+    return CompanySummary(
+      cid: map['cid'] ?? '',
+      cin: map['cin'] ?? '',
+      name: map['name'] ?? '',
+      admin: map['admin'] ?? '',
+    );
   }
 
   static CollectionReference<CompanySummary> get collection => FirebaseFirestore.instance.collection('companies').withConverter(
