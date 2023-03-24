@@ -64,18 +64,7 @@ class _CreateCompanyState extends State<CreateCompany> {
                       _isLoading = true;
                     });
                     try{
-                      final uid = FirebaseAuth.instance.currentUser!.uid;
-                      final docRef = Company.collection.doc();
-                      Company company = Company(
-                        name: _nameController.text,
-                        cid: docRef.id,
-                        cin: _cinController.text,
-                        users: [uid],
-                        events: [],
-                        admin: uid,
-                        creationTimestamp: Timestamp.now(),
-                      );
-                      await FirestoreFunctions().createCompany(company);
+                      await FirestoreFunctions().createCompany(_cinController.text, _nameController.text, '');
                       setState(() {
                         _isLoading = false;
                       });

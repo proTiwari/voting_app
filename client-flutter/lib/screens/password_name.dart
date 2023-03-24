@@ -112,14 +112,7 @@ class _SignupState extends State<Signup> {
             email: email, password: password);
         ContractService contractService = await ContractService.build();
         String address = await contractService.getAddress();
-        AppUser appUser = AppUser(
-            name: _nameController.text,
-            email: email,
-            creationTimestamp: Timestamp.now(),
-            address: address,
-            companies: [],
-            uid: _authResult.user!.uid);
-        await FirestoreFunctions().createUser(appUser);
+        await FirestoreFunctions().createUser(name: _nameController.text, email: email, address: address, uid: _authResult.user!.uid);
       } else {
         Get.snackbar('Error!', 'name is too small');
       }

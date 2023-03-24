@@ -3,6 +3,9 @@
 // Path: lib\objects\Company.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:voting_app/objects/EmployeeSummary.dart';
+
+import 'CompanySummary.dart';
 
 class Company {
   final String cid;
@@ -12,6 +15,7 @@ class Company {
   final String admin;
   final List<String> users;
   final List<String> events;
+  final Map<String, EmployeeSummary> empData;
 
   Company({
     required this.cid,
@@ -21,6 +25,7 @@ class Company {
     required this.admin,
     required this.users,
     required this.events,
+    required this.empData,
   });
 
   factory Company.fromFirestore(
@@ -36,6 +41,7 @@ class Company {
       admin: data['admin'] ?? '',
       users: (data['users'] as List?)?.map((i) => i as String).toList() ?? [],
       events: (data['events'] as List?)?.map((i) => i as String).toList() ?? [],
+      empData: (data['empData'] as Map?)?.map((key, value) => MapEntry(key, EmployeeSummary.fromFirestore(value, options))) ?? {},
     );
   }
 
@@ -49,8 +55,15 @@ class Company {
       'admin': admin,
       'users': users,
       'events': events,
+      'empData': empData.map((key, value) => MapEntry(key, value.toFirestore())),
     };
   }
+
+  CompanySummary getCompanySummary() => CompanySummary(
+    cid: cid,
+    cin: cin,
+    name: name,
+  );
 
   static CollectionReference<Company> get collection => FirebaseFirestore.instance.collection('companies').withConverter(
       fromFirestore: Company.fromFirestore,

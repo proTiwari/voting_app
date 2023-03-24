@@ -3,6 +3,8 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'CompanySummary.dart';
+
 class PollEvent {
   final String evid;
   final String topic;
@@ -13,6 +15,7 @@ class PollEvent {
   final Timestamp creationTimestamp;
   final Timestamp startTimestamp;
   final Timestamp endTimestamp;
+  final CompanySummary companyData;
   final String type = 'poll';
 
   PollEvent({
@@ -25,6 +28,7 @@ class PollEvent {
     required this.creationTimestamp,
     required this.startTimestamp,
     required this.endTimestamp,
+    required this.companyData,
   });
 
   factory PollEvent.fromFirestore(
@@ -42,6 +46,7 @@ class PollEvent {
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       startTimestamp: data['startTimestamp'] ?? Timestamp.now(),
       endTimestamp: data['endTimestamp'] ?? Timestamp.now(),
+      companyData: CompanySummary.fromFirestore(data['companyData'], options),
     );
   }
 
@@ -58,6 +63,7 @@ class PollEvent {
       'startTimestamp': startTimestamp,
       'endTimestamp': endTimestamp,
       'type': type,
+      'companyData': companyData.toFirestore(),
     };
   }
 
