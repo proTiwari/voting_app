@@ -67,18 +67,12 @@ class _CompaniesState extends State<Companies> {
                 scrollDirection: Axis.vertical,
                 itemCount: companies.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to(CompanyDetails(companies[index].cid));
-                    },
-                      child: CompanyCard(companies[index].getCompanySummary())
-                  );
                   var cin = companies[index].cin;
                   var name = companies[index].name;
                   var admin = companies[index].admin;
                   var cid = companies[index].cid;
                   Map<String, EmployeeSummary> empData = companies[index].empData;
-                  return CompanyCard(cin: cin, name: name, admin: admin, cid: cid, empData: empData);
+                  return CompanyCard(companies[index]);
                 },
               ),
             ),

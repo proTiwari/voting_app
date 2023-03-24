@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/objects/Company.dart';
 import 'package:voting_app/objects/EmployeeSummary.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
@@ -9,9 +10,11 @@ import '../services/firestore_functions.dart';
 import '../widgets/create_event_screen.dart';
 
 class CompanyEvents extends StatefulWidget {
-  String? cid;
-  Map<String, EmployeeSummary> empData;
-  CompanyEvents({super.key, this.cid, required this.empData});
+  Company companydata;
+  CompanyEvents({
+    super.key,
+    required this.companydata,
+  });
 
   @override
   State<CompanyEvents> createState() => _CompanyEventsState();
@@ -22,17 +25,13 @@ class _CompanyEventsState extends State<CompanyEvents> {
   void initState() {
     super.initState();
     getAllCompanyEvents();
-    
   }
-
-  
-
-
 
   List<dynamic> events = [];
 
   getAllCompanyEvents() async {
-    events = await FirestoreFunctions().getAllCompanyEvents(widget.cid!);
+    events =
+        await FirestoreFunctions().getAllCompanyEvents(widget.companydata.cid!);
     print("events: ${events}");
   }
 
@@ -122,10 +121,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
                           ),
                           IconButton(
                             icon: Icon(Icons.navigate_next),
-                            onPressed: () {
-                              Get.to(CompanyEvents(
-                                  cid: "cid", empData: widget.empData));
-                            },
+                            onPressed: () {},
                           )
                         ],
                       ),
@@ -140,7 +136,9 @@ class _CompanyEventsState extends State<CompanyEvents> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // create event
-          Get.to(CreateEvent(empData: widget.empData));
+          print("jnkjnknk");
+          Get.to(CreateEvent(empData: widget.companydata.empData, companydata: widget.companydata));
+         
         },
         backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
         child: Icon(
