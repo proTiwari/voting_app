@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:voting_app/widgets/company_members_list.dart';
+import '../objects/Company.dart';
 import '../services/firestore_functions.dart';
 import 'events.dart';
 
 class CompanyDetails extends StatefulWidget {
-  final String cid;
-  const CompanyDetails(this.cid, {super.key});
+  final Company company;
+  const CompanyDetails(this.company, {super.key});
 
   @override
   State<CompanyDetails> createState() => _CompanyDetailsState();
@@ -22,7 +24,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
   List<dynamic> events = [];
 
   getEventsList() async {
-    events = await FirestoreFunctions().getAllCompanyEvents(widget.cid);
+    events = await FirestoreFunctions().getAllCompanyEvents(widget.company.cid);
     setState(() {
       events;
     });
@@ -52,10 +54,8 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         ),
         body: TabBarView(
           children: <Widget>[
-            // CompanyEvents(cid: widget.cid),
-            Center(
-              child: Text("It's rainy here"),
-            ),
+            CompanyEvents(cid: widget.company.cid),
+            CompanyMembers(company: widget.company),
           ],
         ),
       ),

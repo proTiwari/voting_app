@@ -35,7 +35,7 @@ class AppUser {
       email: data['email'] ?? '',
       uid: data['uid'] ?? '',
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
-      companies: data['companies'] ?? [],
+      companies: (data['companies'] as List?)?.map((i) => i as String).toList() ?? [],
       companyData: (data['companyData'] as Map?)?.map((key, value) => MapEntry(key, CompanySummary.fromMap(value))) ?? {},
     );
   }

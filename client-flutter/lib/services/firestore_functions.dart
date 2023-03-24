@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/objects/AppUser.dart';
@@ -48,7 +47,7 @@ class FirestoreFunctions {
       empData: {
         '$uid': EmployeeSummary(
           uid: uid!,
-          name: name,
+          name: FirebaseAuth.instance.currentUser!.displayName!,
           email: FirebaseAuth.instance.currentUser!.email!,
           eid: eid,
         )
@@ -253,11 +252,11 @@ class FirestoreFunctions {
     });
 
     // send email with sendgrid_mailer library
-    final mailer = Mailer('SENDGRID API KEY');
+    final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
     const fromAddress = Address('proshubham5@gmail.com');
     final content = Content('text/plain', 'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
-        'https://voting-app-9f3e5.web.app/invite/${invitation.inviteId}');
+        'https://evotingapp.page.link/invite-member/${invitation.inviteId}');
     final subject = 'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);
 
@@ -273,24 +272,35 @@ class FirestoreFunctions {
   // function to accept an invite
   Future<void> acceptInvite(Invite invite) async {
     if(uid == null) return;
-    final batch = firestore.batch();
-    batch.update(Invite.collection.doc(invite.inviteId), {
-      'status': InviteStatus.accepted.name,
-      'actionTimestamp': Timestamp.now()
+    await firestore.runTransaction((transaction) async {
+      final inviteDoc = await transaction.get(Invite.collection.doc(invite.inviteId));
+      final userDoc = await transaction.get(AppUser.collection.doc(uid));
+      if (userDoc.exists && inviteDoc.exists) {
+        final invite = inviteDoc.data() as Invite;
+        transaction.update(Invite.collection.doc(invite.inviteId), {
+          'status': InviteStatus.accepted.name,
+          'actionTimestamp': Timestamp.now()
+        });
+        if(userDoc.data()!.companies.contains(invite.cid)) return;
+        transaction.update(AppUser.collection.doc(uid), {
+          'companies': FieldValue.arrayUnion([invite.cid]),
+          'companyData.${invite.cid}': invite.companyData.toFirestore(),
+        });
+        transaction.update(Company.collection.doc(invite.cid), {
+          'users': FieldValue.arrayUnion([uid]),
+          'empData.$uid': invite.employeeData.toFirestore(),
+        });
+      }
+      else {
+        throw Exception('Invite does not exist');
+      }
     });
-    batch.update(AppUser.collection.doc(uid), {
-      'companies': FieldValue.arrayUnion([invite.cid])
-    });
-    batch.update(Company.collection.doc(invite.cid), {
-      'users': FieldValue.arrayUnion([uid])
-    });
-    await batch.commit();
   }
 
   // function to decline an invite
-  Future<void> declineInvite(Invite invite) async {
+  Future<void> declineInvite(String inviteId) async {
     if(uid == null) return;
-    await Invite.collection.doc(invite.inviteId).update({
+    await Invite.collection.doc(inviteId).update({
       'status': InviteStatus.rejected.name,
       'actionTimestamp': Timestamp.now()
     });
@@ -304,5 +314,19 @@ class FirestoreFunctions {
       invites.add(Invite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
     }
     return invites;
+  }
+
+  // getInvite function to get an invite from the collection invites where the invite id is equal to the given invite id
+  Future<Invite?> getInvite(String inviteId) async {
+    print('getInvite: $inviteId');
+    var snapshot = await Invite.collection.doc(inviteId).get();
+    print('getInvite: $snapshot ${snapshot.data()}');
+    return snapshot.data();
+  }
+
+  // function to get all members of a company
+  Future<List<EmployeeSummary>> getCompanyMembers(String cid) async {
+    var snapshot = await Company.collection.doc(cid).get();
+    return snapshot.data()!.empData.values.toList();
   }
 }

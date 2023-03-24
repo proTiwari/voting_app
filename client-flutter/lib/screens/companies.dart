@@ -73,6 +73,7 @@ class _CompaniesState extends State<Companies> {
                   var cid = companies[index].cid;
                   Map<String, EmployeeSummary> empData = companies[index].empData;
                   return CompanyCard(companies[index]);
+               
                 },
               ),
             ),
