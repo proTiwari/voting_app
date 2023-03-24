@@ -41,6 +41,8 @@ abstract class FlutterFlowTheme {
   late Color black600;
   late Color tertiary400;
   late Color textColor;
+  late Color cardBackgroundColor = Color(0xFFDEE9FF);
+  late Color cardTextColor = Color(0xFF273F77);
 
   String get title1Family => typography.title1Family;
   TextStyle get title1 => typography.title1;
@@ -94,6 +96,7 @@ class LightModeTheme extends FlutterFlowTheme {
   late Color black600 = Color(0xFF090F13);
   late Color tertiary400 = Color(0xFF39D2C0);
   late Color textColor = Color(0xFF1E2429);
+  late Color cardBackgroundColor = Color(0xFFDEE9FF);
 }
 
 abstract class Typography {

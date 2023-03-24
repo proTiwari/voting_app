@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/objects/AppUser.dart';
@@ -88,7 +90,7 @@ class FirestoreFunctions {
     List<Company> companies = [];
     var snapshot = await Company.collection.where('users', arrayContains: uid).get();
     for (var doc in snapshot.docs) {
-      companies.add(Company.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
+      companies.add(doc.data());
     }
     return companies;
   }
@@ -141,6 +143,18 @@ class FirestoreFunctions {
       recipients: [companyEmail],
       isHTML: false,
     );*/
+    http.post(
+      Uri.parse('https://us-central1-voting-app-9f3e5.cloudfunctions.net/sendEmail'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'email': companyEmail,
+        'subject': 'Invite to join a company',
+        'body': 'You have been invited to join a company on the app. Click the link below to accept the invite. \n\n'
+            'https://voting-app-9f3e5.web.app/invite/${invite.inviteId}'
+      }),
+    );
   }
 
   // function to accept an invite
