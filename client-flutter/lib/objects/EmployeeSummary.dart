@@ -40,6 +40,15 @@ class EmployeeSummary {
     };
   }
 
+  static EmployeeSummary fromMap(Map<String, dynamic> map) {
+    return EmployeeSummary(
+      uid: map['uid'] ?? '',
+      eid: map['eid'] ?? '',
+      name: map['name'] ?? '',
+      email: map['email'] ?? '',
+    );
+  }
+
   static CollectionReference<EmployeeSummary> get collection => FirebaseFirestore.instance.collection('employees').withConverter(
       fromFirestore: EmployeeSummary.fromFirestore,
       toFirestore: (EmployeeSummary employeeSummary, _) => employeeSummary.toFirestore()

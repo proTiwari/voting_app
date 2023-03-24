@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/screens/company_details.dart';
 import 'package:voting_app/screens/events.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
@@ -34,7 +35,7 @@ class _CompaniesState extends State<Companies> {
       companies;
     });
 
-    print("iwjeofwjioe");
+    print("in companies");
     print(companies);
   }
 
@@ -66,6 +67,12 @@ class _CompaniesState extends State<Companies> {
                 scrollDirection: Axis.vertical,
                 itemCount: companies.length,
                 itemBuilder: (BuildContext context, int index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(CompanyDetails(companies[index].cid));
+                    },
+                      child: CompanyCard(companies[index].getCompanySummary())
+                  );
                   var cin = companies[index].cin;
                   var name = companies[index].name;
                   var admin = companies[index].admin;

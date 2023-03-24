@@ -4,22 +4,13 @@ import 'package:get/get.dart';
 import 'package:voting_app/objects/EmployeeSummary.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
+import '../objects/Company.dart';
+import '../objects/CompanySummary.dart';
 import '../screens/events.dart';
 
 class CompanyCard extends StatelessWidget {
-  var cin = '';
-  var name = '';
-  var admin = '';
-  var cid = '';
-  var empData = <String, EmployeeSummary>{};
-  CompanyCard({
-    super.key,
-    required this.cin,
-    required this.name,
-    required this.admin,
-    required this.cid,
-    required this.empData,
-  });
+  final Company _companySummary;
+  const CompanyCard(this._companySummary, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,20 +37,20 @@ class CompanyCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    cin.isNotEmpty
-                        ? Text(cin,
+                    _companySummary.cin.isNotEmpty
+                        ? Text(_companySummary.cin,
                             style: TextStyle(
                                 color:
                                     FlutterFlowTheme.of(context).cardTextColor,
                                 fontSize: 12))
                         : Container(),
                     const SizedBox(height: 4),
-                    Text(name,
+                    Text(_companySummary.name,
                         style: TextStyle(
                             color: FlutterFlowTheme.of(context).cardTextColor,
                             fontSize: 20)),
                     const SizedBox(height: 6),
-                    admin == FirebaseAuth.instance.currentUser!.uid
+                    _companySummary.admin == FirebaseAuth.instance.currentUser!.uid
                         ? Container(
                             width: 70,
                             height: 30,
@@ -89,7 +80,7 @@ class CompanyCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.navigate_next),
               onPressed: () {
-                Get.to(CompanyEvents(cid: cid, empData: empData));
+                Get.to(CompanyEvents(empData: {},));
               },
             )
           ],

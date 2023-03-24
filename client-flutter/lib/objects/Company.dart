@@ -41,7 +41,7 @@ class Company {
       admin: data['admin'] ?? '',
       users: (data['users'] as List?)?.map((i) => i as String).toList() ?? [],
       events: (data['events'] as List?)?.map((i) => i as String).toList() ?? [],
-      empData: (data['empData'] as Map?)?.map((key, value) => MapEntry(key, EmployeeSummary.fromFirestore(value, options))) ?? {},
+      empData: (data['empData'] as Map?)?.map((key, value) => MapEntry(key, EmployeeSummary.fromMap(value))) ?? {},
     );
   }
 
@@ -63,6 +63,7 @@ class Company {
     cid: cid,
     cin: cin,
     name: name,
+    admin: admin,
   );
 
   static CollectionReference<Company> get collection => FirebaseFirestore.instance.collection('companies').withConverter(

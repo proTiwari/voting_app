@@ -44,8 +44,8 @@ class Invite {
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       status: data['status'] ? InviteStatus.values.byName(data['status']): InviteStatus.pending,
       actionTimestamp: data['actionTimestamp'],
-      companyData: CompanySummary.fromFirestore(data['companyData'], options),
-      employeeData: EmployeeSummary.fromFirestore(data['employeeData'], options),
+      companyData: CompanySummary.fromMap(data['companyData']),
+      employeeData: EmployeeSummary.fromMap(data['employeeData']),
     );
   }
 

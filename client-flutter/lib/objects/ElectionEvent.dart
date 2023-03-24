@@ -46,7 +46,7 @@ class ElectionEvent {
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       startTimestamp: data['startTimestamp'] ?? Timestamp.now(),
       endTimestamp: data['endTimestamp'] ?? Timestamp.now(),
-      companyData: CompanySummary.fromFirestore(data['companyData'], options),
+      companyData: CompanySummary.fromMap(data['companyData']),
     );
   }
 

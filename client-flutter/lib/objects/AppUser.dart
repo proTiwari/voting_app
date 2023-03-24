@@ -36,7 +36,7 @@ class AppUser {
       uid: data['uid'] ?? '',
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       companies: data['companies'] ?? [],
-      companyData: (data['companyData'] as Map?)?.map((key, value) => MapEntry(key, CompanySummary.fromFirestore(value, options))) ?? {},
+      companyData: (data['companyData'] as Map?)?.map((key, value) => MapEntry(key, CompanySummary.fromMap(value))) ?? {},
     );
   }
 
