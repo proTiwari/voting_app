@@ -2,6 +2,9 @@
 // Path: lib\objects\Invite.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:voting_app/objects/EmployeeSummary.dart';
+
+import 'CompanySummary.dart';
 
 enum InviteStatus { pending, accepted, rejected }
 
@@ -12,6 +15,8 @@ class Invite {
   final String companyEmail;
   final Timestamp creationTimestamp;
   final InviteStatus status;
+  final CompanySummary companyData;
+  final EmployeeSummary employeeData;
   final Timestamp? actionTimestamp;
 
   Invite({
@@ -21,6 +26,8 @@ class Invite {
     required this.companyEmail,
     required this.creationTimestamp,
     required this.status,
+    required this.companyData,
+    required this.employeeData,
     this.actionTimestamp,
   });
 
@@ -37,6 +44,8 @@ class Invite {
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       status: data['status'] ? InviteStatus.values.byName(data['status']): InviteStatus.pending,
       actionTimestamp: data['actionTimestamp'],
+      companyData: CompanySummary.fromFirestore(data['companyData'], options),
+      employeeData: EmployeeSummary.fromFirestore(data['employeeData'], options),
     );
   }
 
@@ -50,6 +59,8 @@ class Invite {
       'creationTimestamp': creationTimestamp,
       'status': status.name,
       'actionTimestamp': actionTimestamp,
+      'companyData': companyData.toFirestore(),
+      'employeeData': employeeData.toFirestore(),
     };
   }
 

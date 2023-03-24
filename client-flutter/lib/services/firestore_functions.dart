@@ -7,44 +7,142 @@ import 'package:voting_app/objects/Company.dart';
 import 'package:voting_app/objects/Invite.dart';
 import 'package:voting_app/objects/PollEvent.dart';
 import '../objects/ElectionEvent.dart';
+import '../objects/EmployeeSummary.dart';
+import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 
 class FirestoreFunctions {
   String? uid = FirebaseAuth.instance.currentUser?.uid;
   var firestore = FirebaseFirestore.instance;
 
   // Create a new user in the database
-  Future<void> createUser(AppUser user) async {
+  Future<void> createUser({
+    required String name,
+    required String address,
+    required String email,
+    required String uid,
+  }) async {
+    final user = AppUser(
+      name: name,
+      address: address,
+      email: email.trim().toLowerCase(),
+      uid: uid,
+      creationTimestamp: Timestamp.now(),
+      companies: [],
+      companyData: {},
+    );
     await AppUser.collection.doc(user.uid).set(user);
   }
 
+
   // Create a new company in the database
-  Future<void> createCompany(Company company) async {
+  Future<void> createCompany(String cin, String name, String eid) async {
+    final companyDocRef = Company.collection.doc();
+    final company = Company(
+      cid: companyDocRef.id,
+      cin: cin,
+      creationTimestamp: Timestamp.now(),
+      name: name,
+      admin: uid!,
+      users: [uid!],
+      events: [],
+      empData: {
+        '$uid': EmployeeSummary(
+          uid: uid!,
+          name: name,
+          email: FirebaseAuth.instance.currentUser!.email!,
+          eid: eid,
+        )
+      },
+    );
     final batch = firestore.batch();
     batch.set(Company.collection.doc(company.cid), company);
     batch.update(AppUser.collection.doc(uid), {
-      'companies': FieldValue.arrayUnion([company.cid])
+      'companies': FieldValue.arrayUnion([company.cid]),
+      'companyData.${company.cid}': company.getCompanySummary().toFirestore(),
     });
     await batch.commit();
   }
 
   // Create a new event with type poll in the database
-  Future<void> createPollEvent(PollEvent event) async {
-    final batch = firestore.batch();
-    batch.set(PollEvent.collection.doc(event.evid), event);
-    batch.update(Company.collection.doc(event.cid), {
-      'events': FieldValue.arrayUnion([event.evid])
+  Future<void> createPollEvent({
+    required String topic,
+    required String description,
+    required List<String> options,
+    required List<String> voters,
+    required Timestamp startTimestamp,
+    required Timestamp endTimestamp,
+    required String cid,
+  }) async {
+    final eventDocRef = PollEvent.collection.doc();
+
+    await firestore.runTransaction<PollEvent>((transaction) async {
+      final companyDoc = await transaction.get(Company.collection.doc(cid));
+      if (companyDoc.exists) {
+        final company = companyDoc.data() as Company;
+        PollEvent event = PollEvent(
+          evid: eventDocRef.id,
+          topic: topic,
+          description: description,
+          options: options,
+          startTimestamp: startTimestamp,
+          endTimestamp: endTimestamp,
+          cid: cid,
+          voters: voters,
+          creationTimestamp: Timestamp.now(),
+          companyData: company.getCompanySummary(),
+        );
+        transaction.set(eventDocRef, event);
+        transaction.update(Company.collection.doc(event.cid), {
+          'events': FieldValue.arrayUnion([event.evid])
+        });
+
+        return event;
+      }
+      else {
+        throw Exception('Company does not exist');
+      }
     });
-    await batch.commit();
   }
 
   // Create a new event with type election in the database
-  Future<void> createElectionEvent(ElectionEvent event) async {
-    final batch = firestore.batch();
-    batch.set(ElectionEvent.collection.doc(event.evid), event);
-    batch.update(Company.collection.doc(event.cid), {
-      'events': FieldValue.arrayUnion([event.evid])
+  Future<void> createElectionEvent({
+    required String topic,
+    required String description,
+    required List<String> candidates,
+    required List<String> voters,
+    required Timestamp startTimestamp,
+    required Timestamp endTimestamp,
+    required String cid,
+  }) async {
+    final eventDocRef = ElectionEvent.collection.doc();
+
+    await firestore.runTransaction<ElectionEvent>((transaction) async {
+      final companyDoc = await transaction.get(Company.collection.doc(cid));
+      if (companyDoc.exists) {
+        final company = companyDoc.data() as Company;
+        ElectionEvent event = ElectionEvent(
+          evid: eventDocRef.id,
+          topic: topic,
+          description: description,
+          candidates: candidates,
+          startTimestamp: startTimestamp,
+          endTimestamp: endTimestamp,
+          cid: cid,
+          voters: voters,
+          creationTimestamp: Timestamp.now(),
+          companyData: company.getCompanySummary(),
+        );
+        transaction.set(eventDocRef, event);
+        transaction.update(Company.collection.doc(event.cid), {
+          'events': FieldValue.arrayUnion([event.evid])
+        });
+
+        return event;
+      }
+      else {
+        throw Exception('Company does not exist');
+      }
     });
-    await batch.commit();
   }
 
   // get all active events from the collection events
@@ -121,40 +219,55 @@ class FirestoreFunctions {
   }
 
   // function to invite a user to a company
-  Future<void> inviteUser(String companyEmail, String cid) async {
+  Future<void> inviteUser(String companyEmail, String cid, String eid) async {
     if(uid == null) return;
     final docRef = Invite.collection.doc();
-    final invite = Invite(
-      companyEmail: companyEmail,
-      cid: cid,
-      uid: uid!,
-      inviteId: docRef.id,
-      creationTimestamp: Timestamp.now(),
-      actionTimestamp: null,
-      status: InviteStatus.pending
-    );
-    await docRef.set(invite);
 
-    // TODO: send email
-    /*final email = Email(
-      body: 'You have been invited to join a company on the app. Click the link below to accept the invite. \n\n'
-          'https://voting-app-9f3e5.web.app/invite/${invite.inviteId}',
-      subject: 'Invite to join a company',
-      recipients: [companyEmail],
-      isHTML: false,
-    );*/
-    http.post(
-      Uri.parse('https://us-central1-voting-app-9f3e5.cloudfunctions.net/sendEmail'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        'email': companyEmail,
-        'subject': 'Invite to join a company',
-        'body': 'You have been invited to join a company on the app. Click the link below to accept the invite. \n\n'
-            'https://voting-app-9f3e5.web.app/invite/${invite.inviteId}'
-      }),
-    );
+    // run transaction and get company data
+    final invitation = await firestore.runTransaction<Invite>((transaction) async {
+      final companyDoc = await transaction.get(Company.collection.doc(cid));
+      if (companyDoc.exists) {
+        final company = companyDoc.data() as Company;
+        final invite = Invite(
+            companyEmail: companyEmail,
+            cid: cid,
+            uid: uid!,
+            inviteId: docRef.id,
+            creationTimestamp: Timestamp.now(),
+            actionTimestamp: null,
+            status: InviteStatus.pending,
+            companyData: company.getCompanySummary(),
+            employeeData: EmployeeSummary(
+              uid: uid!,
+              name: (await getUser())!.name,
+              email: companyEmail,
+              eid: eid,
+            )
+        );
+        transaction.set(docRef, invite);
+        return invite;
+      }
+      else {
+        throw Exception('Company does not exist');
+      }
+    });
+
+    // send email with sendgrid_mailer library
+    final mailer = Mailer('SENDGRID API KEY');
+    final toAddress = Address(invitation.companyEmail);
+    const fromAddress = Address('proshubham5@gmail.com');
+    final content = Content('text/plain', 'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
+        'https://voting-app-9f3e5.web.app/invite/${invitation.inviteId}');
+    final subject = 'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
+    final personalization = Personalization([toAddress]);
+
+    final email =
+    Email([personalization], fromAddress, subject, content: [content]);
+    mailer.send(email).then((result) {
+      print(result);
+    }).catchError((onError) {
+      print('error');
+    });
   }
 
   // function to accept an invite

@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/screens/password_name.dart';
 import 'package:voting_app/screens/password_screen.dart';
 import 'package:voting_app/services/app_state.dart';
+import '../objects/AppUser.dart';
 import '../widgets/input_field.dart';
 
 class EmailScreen extends StatefulWidget {
@@ -76,8 +77,7 @@ class _EmailScreenState extends State<EmailScreen> {
                       padding: const EdgeInsets.only(right: 40.0),
                       child: ElevatedButton.icon(
                         onPressed: () async {
-                          loginUser(
-                              _emailController.text, _passwordController.text);
+                          loginUser();
                         },
                         label: Text('Next'),
                         icon: Icon(
@@ -107,21 +107,22 @@ class _EmailScreenState extends State<EmailScreen> {
     );
   }
 
-  void loginUser(String email, String password) async {
+  void loginUser() async {
+    final mEmail = _emailController.text.toString().trim().toLowerCase();
     try {
       var result;
-      result = await FirebaseFirestore.instance
-          .collection("Users")
-          .where("email", isEqualTo: _emailController.text)
+      result = await AppUser.collection
+          .where("email", isEqualTo: mEmail)
           .get()
           .then((value) {
         print(value.docs);
         if (value.docs.isEmpty) {
           print("user does not exist");
+
           if (RegExp(
                   r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-              .hasMatch(_emailController.text.toString())) {
-            AppState().email = _emailController.text.toString();
+              .hasMatch(mEmail)) {
+            AppState().email = mEmail;
             Get.to(Signup());
           } else {
             Get.snackbar("login error", 'email is invalid!');
@@ -129,7 +130,7 @@ class _EmailScreenState extends State<EmailScreen> {
         }
         if (value.docs.isNotEmpty) {
           print("user does not exist");
-          AppState().email = _emailController.text.toString();
+          AppState().email = mEmail;
           Get.to(Login());
         }
       });

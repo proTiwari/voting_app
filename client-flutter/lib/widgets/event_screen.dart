@@ -93,10 +93,10 @@ class _CreateEventState extends State<CreateEvent> {
             [df.hh, ':', df.nn, " ", df.am]).toString();
       });
   }
-List<Candidate> selectCandidateList = [];
 
+  List<Candidate> selectCandidateList = [];
 
-   Future<void> openCityDialog() async {
+  Future<void> openCandidateDialog() async {
     await FilterListDialog.display<Candidate>(
       width: MediaQuery.of(context).size.width < 800
           ? 14
@@ -117,15 +117,7 @@ List<Candidate> selectCandidateList = [];
       },
       onApplyButtonClick: (list) {
         setState(() {
-          if (list!.isEmpty) {
-            selectedCityList = List.from(list!);
-            FFAppState().cityname = '';
-            print("selectedCityList: ${selectedCityList!}");
-          } else {
-            selectedCityList = List.from(list!);
-            FFAppState().cityname = list.first.name!;
-            print("selectedCityList: ${selectedCityList!}");
-          }
+          selectCandidateList = List.from(list!);
         });
         Navigator.pop(context);
       },
@@ -181,6 +173,7 @@ List<Candidate> selectCandidateList = [];
                             hintText: "Event Description"),
                       ),
                     ),
+                    
                     // DropdownButton<String>(
                     //   isExpanded: true,
                     //   hint: const Text('Select type'),
@@ -207,8 +200,30 @@ List<Candidate> selectCandidateList = [];
                     // ),
 
                     // code for candidate
-                    
-                    
+                    InkWell(
+                      onTap: () {
+                        openCandidateDialog();
+                      },
+                      child: Container(
+                        width: _width / 1.1,
+                        height: _height / 13,
+                        margin: EdgeInsets.only(top: 30),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: Colors.grey[200]),
+                        child: TextFormField(
+                          style: TextStyle(fontSize: 20),
+                          textAlign: TextAlign.center,
+                          enabled: false,
+                          keyboardType: TextInputType.text,
+                          
+                          decoration: InputDecoration(
+                              hintText: 'Select Candidates',
+                              disabledBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide.none),
+                              contentPadding: EdgeInsets.only(top: 0.0)),
+                        ),
+                      ),
+                    ),
                     InkWell(
                       onTap: () {
                         _selectstartTime(context);
@@ -283,26 +298,26 @@ List<Candidate> selectCandidateList = [];
                     try {
                       final uid = FirebaseAuth.instance.currentUser!.uid;
                       final docRef = Company.collection.doc();
-                      PollEvent pollEvent = PollEvent(
-                          evid: docRef.id,
-                          topic: _nameController.text,
-                          description: _cinController.text,
-                          endTimestamp: Timestamp.now(),
-                          creationTimestamp: Timestamp.now(),
-                          startTimestamp: Timestamp.now(),
-                          cid: '',
-                          options: [],
-                          voters: []);
-                      ElectionEvent electionEvent = ElectionEvent(
-                          evid: docRef.id,
-                          topic: _nameController.text,
-                          description: _cinController.text,
-                          endTimestamp: Timestamp.now(),
-                          creationTimestamp: Timestamp.now(),
-                          startTimestamp: Timestamp.now(),
-                          cid: '',
-                          voters: [],
-                          candidates: []);
+                      // PollEvent pollEvent = PollEvent(
+                      //     evid: docRef.id,
+                      //     topic: _nameController.text,
+                      //     description: _cinController.text,
+                      //     endTimestamp: Timestamp.now(),
+                      //     creationTimestamp: Timestamp.now(),
+                      //     startTimestamp: Timestamp.now(),
+                      //     cid: '',
+                      //     options: [],
+                      //     voters: []);
+                      // ElectionEvent electionEvent = ElectionEvent(
+                      //     evid: docRef.id,
+                      //     topic: _nameController.text,
+                      //     description: _cinController.text,
+                      //     endTimestamp: Timestamp.now(),
+                      //     creationTimestamp: Timestamp.now(),
+                      //     startTimestamp: Timestamp.now(),
+                      //     cid: '',
+                      //     voters: [],
+                      //     candidates: []);
                       // await FirestoreFunctions().createElectionEvent(election);
                       // await FirestoreFunctions().createPollEvent(poll);
                       setState(() {

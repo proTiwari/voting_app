@@ -4,6 +4,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:connectivity_wrapper/connectivity_wrapper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/screens/homescreen.dart';
+import 'package:voting_app/widgets/bottom_nav_bar.dart';
 import '../services/app_state.dart';
 import '../widgets/input_field.dart';
 
@@ -104,7 +105,7 @@ class _LoginState extends State<Login> {
       var _authResult = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
 
-      Get.to(HomeScreen());
+      Get.to(CustomBottomNavigation());
     } catch (err) {
       Get.snackbar('Processing Error', err.toString());
     }

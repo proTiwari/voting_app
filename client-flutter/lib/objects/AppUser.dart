@@ -3,6 +3,7 @@
 // Path: lib\objects\AppUser.dart
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:voting_app/objects/CompanySummary.dart';
 
 class AppUser {
   final String name;
@@ -11,6 +12,7 @@ class AppUser {
   final String uid;
   final Timestamp creationTimestamp;
   final List<String> companies;
+  final Map<String, CompanySummary> companyData;
 
   AppUser({
     required this.name,
@@ -19,6 +21,7 @@ class AppUser {
     required this.uid,
     required this.creationTimestamp,
     required this.companies,
+    required this.companyData,
     });
 
   factory AppUser.fromFirestore(
@@ -33,6 +36,7 @@ class AppUser {
       uid: data['uid'] ?? '',
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       companies: data['companies'] ?? [],
+      companyData: (data['companyData'] as Map?)?.map((key, value) => MapEntry(key, CompanySummary.fromFirestore(value, options))) ?? {},
     );
   }
 
@@ -45,6 +49,7 @@ class AppUser {
       'uid': uid,
       'creationTimestamp': creationTimestamp,
       'companies': companies,
+      'companyData': companyData.map((key, value) => MapEntry(key, value.toFirestore())),
     };
   }
 
