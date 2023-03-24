@@ -33,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List activeEvents = [];
 
-  getActiveEvents ()async{
+  getActiveEvents() async {
     activeEvents = await FirestoreFunctions().getActiveEvents();
   }
 
@@ -134,14 +134,17 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-                children:
-                [
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              IconButton(
+                icon: Icon(Icons.logout),
+                onPressed: () {
+                  FirebaseAuth.instance.signOut();
+                },
+              ),
               GestureDetector(
                 onTap: () async {
-                  Get.snackbar(
-                      'Copied!', 'address is copied to clipboard!');
+                  Get.snackbar('Copied!', 'address is copied to clipboard!');
                   await Clipboard.setData(
                       ClipboardData(text: AppState().address));
                 },
@@ -168,12 +171,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: FlutterFlowTheme.of(context)
                                       .bodyText1
                                       .override(
-                                    fontFamily: 'Urbanist',
-                                    color: FlutterFlowTheme.of(context)
-                                        .cardTextColor,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                        fontFamily: 'Urbanist',
+                                        color: FlutterFlowTheme.of(context)
+                                            .cardTextColor,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                 ),
                                 Icon(Icons.copy),
                               ],
@@ -197,12 +200,12 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: FlutterFlowTheme.of(context)
                                   .bodyText1
                                   .override(
-                                fontFamily: 'Urbanist',
-                                color: FlutterFlowTheme.of(context)
-                                    .cardTextColor,
-                                fontSize: 34,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                    fontFamily: 'Urbanist',
+                                    color: FlutterFlowTheme.of(context)
+                                        .cardTextColor,
+                                    fontSize: 34,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                             ),
                           ],
                         ),
@@ -214,14 +217,14 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 'Events',
                 style: FlutterFlowTheme.of(context).bodyText1.override(
-                  fontFamily: 'Urbanist',
-                  color: FlutterFlowTheme.of(context).darkBGstatic,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                      fontFamily: 'Urbanist',
+                      color: FlutterFlowTheme.of(context).darkBGstatic,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               Expanded(
-                flex:1,
+                flex: 1,
                 child: ListView.builder(
                   padding: EdgeInsets.zero,
                   shrinkWrap: true,
@@ -233,33 +236,34 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
                         child: Container(
-                          width: MediaQuery.of(context).size.width * 0.91,
-                          height: 80,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(220, 59, 58, 58),
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text("${activeEvents[index].topic}", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                              ),
-                              Text("${activeEvents[index].description}"),
-                              Container()
-                            ],
-                          )
-                        ),
+                            width: MediaQuery.of(context).size.width * 0.91,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: Color.fromARGB(220, 59, 58, 58),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "${activeEvents[index].topic}",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                Text("${activeEvents[index].description}"),
+                                Container()
+                              ],
+                            )),
                       ),
                     );
                   },
                 ),
               ),
-
-
             ]),
           ),
-
         ),
       ),
     );

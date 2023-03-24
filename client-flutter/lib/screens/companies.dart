@@ -5,6 +5,7 @@ import 'package:voting_app/screens/events.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/Company.dart';
+import '../objects/EmployeeSummary.dart';
 import '../services/firestore_functions.dart';
 import '../widgets/company_card.dart';
 import '../widgets/create_company.dart';
@@ -69,7 +70,8 @@ class _CompaniesState extends State<Companies> {
                   var name = companies[index].name;
                   var admin = companies[index].admin;
                   var cid = companies[index].cid;
-                  return CompanyCard(cin: cin, name: name, admin: admin, cid: cid);
+                  Map<String, EmployeeSummary> empData = companies[index].empData;
+                  return CompanyCard(cin: cin, name: name, admin: admin, cid: cid, empData: empData);
                 },
               ),
             ),

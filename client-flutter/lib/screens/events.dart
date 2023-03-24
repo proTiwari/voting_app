@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/objects/EmployeeSummary.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/ElectionEvent.dart';
 import '../objects/PollEvent.dart';
 import '../services/firestore_functions.dart';
-import '../widgets/event_screen.dart';
+import '../widgets/create_event_screen.dart';
 
 class CompanyEvents extends StatefulWidget {
   String? cid;
-  CompanyEvents({super.key, this.cid});
+  Map<String, EmployeeSummary> empData;
+  CompanyEvents({super.key, this.cid, required this.empData});
 
   @override
   State<CompanyEvents> createState() => _CompanyEventsState();
@@ -20,7 +22,12 @@ class _CompanyEventsState extends State<CompanyEvents> {
   void initState() {
     super.initState();
     getAllCompanyEvents();
+    
   }
+
+  
+
+
 
   List<dynamic> events = [];
 
@@ -116,7 +123,8 @@ class _CompanyEventsState extends State<CompanyEvents> {
                           IconButton(
                             icon: Icon(Icons.navigate_next),
                             onPressed: () {
-                              Get.to(CompanyEvents(cid: "cid"));
+                              Get.to(CompanyEvents(
+                                  cid: "cid", empData: widget.empData));
                             },
                           )
                         ],
@@ -132,7 +140,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // create event
-          Get.to(CreateEvent());
+          Get.to(CreateEvent(empData: widget.empData));
         },
         backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
         child: Icon(

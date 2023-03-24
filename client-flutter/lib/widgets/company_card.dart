@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/objects/EmployeeSummary.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../screens/events.dart';
@@ -10,12 +11,14 @@ class CompanyCard extends StatelessWidget {
   var name = '';
   var admin = '';
   var cid = '';
+  var empData = <String, EmployeeSummary>{};
   CompanyCard({
     super.key,
     required this.cin,
     required this.name,
     required this.admin,
     required this.cid,
+    required this.empData,
   });
 
   @override
@@ -86,7 +89,7 @@ class CompanyCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.navigate_next),
               onPressed: () {
-                Get.to(CompanyEvents(cid: cid));
+                Get.to(CompanyEvents(cid: cid, empData: empData));
               },
             )
           ],

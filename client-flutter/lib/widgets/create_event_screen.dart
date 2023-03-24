@@ -5,15 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart' as df;
 import 'package:get/get.dart';
 import 'package:voting_app/objects/ElectionEvent.dart';
+import 'package:voting_app/objects/EmployeeSummary.dart';
 import 'package:voting_app/services/app_state.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import 'package:filter_list/filter_list.dart';
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/Company.dart';
+import '../objects/CompanySummary.dart';
 import '../objects/PollEvent.dart';
 
 class CreateEvent extends StatefulWidget {
-  const CreateEvent({Key? key}) : super(key: key);
+  Map<String, EmployeeSummary> empData;
+  CreateEvent({Key? key, required this.empData}) : super(key: key);
 
   @override
   State<CreateEvent> createState() => _CreateEventState();
@@ -41,6 +44,22 @@ class _CreateEventState extends State<CreateEvent> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _starttimeController = TextEditingController();
   TextEditingController _endtimeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    getCandidates();
+  }
+
+  getCandidates() {
+    widget.empData.entries.forEach((element) {
+      print("element: ${element.value.name}");
+      setState(() {
+        selectCandidateList
+            .add(Candidate(name: element.value.name, avatar: ''));
+      });
+    });
+  }
 
   Future<Null> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -173,7 +192,7 @@ class _CreateEventState extends State<CreateEvent> {
                             hintText: "Event Description"),
                       ),
                     ),
-                    
+
                     // DropdownButton<String>(
                     //   isExpanded: true,
                     //   hint: const Text('Select type'),
@@ -215,7 +234,6 @@ class _CreateEventState extends State<CreateEvent> {
                           textAlign: TextAlign.center,
                           enabled: false,
                           keyboardType: TextInputType.text,
-                          
                           decoration: InputDecoration(
                               hintText: 'Select Candidates',
                               disabledBorder: UnderlineInputBorder(
@@ -298,26 +316,18 @@ class _CreateEventState extends State<CreateEvent> {
                     try {
                       final uid = FirebaseAuth.instance.currentUser!.uid;
                       final docRef = Company.collection.doc();
-                      // PollEvent pollEvent = PollEvent(
-                      //     evid: docRef.id,
-                      //     topic: _nameController.text,
-                      //     description: _cinController.text,
-                      //     endTimestamp: Timestamp.now(),
-                      //     creationTimestamp: Timestamp.now(),
-                      //     startTimestamp: Timestamp.now(),
-                      //     cid: '',
-                      //     options: [],
-                      //     voters: []);
-                      // ElectionEvent electionEvent = ElectionEvent(
-                      //     evid: docRef.id,
-                      //     topic: _nameController.text,
-                      //     description: _cinController.text,
-                      //     endTimestamp: Timestamp.now(),
-                      //     creationTimestamp: Timestamp.now(),
-                      //     startTimestamp: Timestamp.now(),
-                      //     cid: '',
-                      //     voters: [],
-                      //     candidates: []);
+                      ElectionEvent electionEvent = ElectionEvent(
+                          evid: docRef.id,
+                          topic: _nameController.text,
+                          description: _cinController.text,
+                          endTimestamp: Timestamp.now(),
+                          creationTimestamp: Timestamp.now(),
+                          startTimestamp: Timestamp.now(),
+                          cid: '',
+                          voters: [],
+                          candidates: [],
+                          companyData:
+                              CompanySummary(cid: '', cin: '', name: ''));
                       // await FirestoreFunctions().createElectionEvent(election);
                       // await FirestoreFunctions().createPollEvent(poll);
                       setState(() {
