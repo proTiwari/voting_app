@@ -44,17 +44,20 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
             label: 'Home',
           ),
           NavigationDestination(
-            icon: Icon(Icons.diversity_3),
+            icon: Icon(Icons.groups),
             label: 'Companies',
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.person),
-            icon: Icon(Icons.bookmark_border),
+            icon: Icon(Icons.person),
             label: 'Me',
           ),
         ],
       ),
-      body: <Widget>[HomeScreen(), const Companies(), const Me()][currentPageIndex],
+      body: <Widget>[
+        HomeScreen(),
+        const Companies(),
+        const Me()
+      ][currentPageIndex],
     );
   }
 }

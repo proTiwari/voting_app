@@ -5,6 +5,7 @@ import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/ElectionEvent.dart';
 import '../objects/PollEvent.dart';
 import '../services/firestore_functions.dart';
+import '../widgets/event_screen.dart';
 
 class CompanyEvents extends StatefulWidget {
   String? cid;
@@ -17,7 +18,6 @@ class CompanyEvents extends StatefulWidget {
 class _CompanyEventsState extends State<CompanyEvents> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getAllCompanyEvents();
   }
@@ -26,8 +26,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
 
   getAllCompanyEvents() async {
     events = await FirestoreFunctions().getAllCompanyEvents(widget.cid!);
-    print("iwjeofwjioe");
-    print(events);
+    print("events: ${events}");
   }
 
   @override
@@ -61,12 +60,11 @@ class _CompanyEventsState extends State<CompanyEvents> {
                   String topic = "";
                   String description = "";
                   String timeStr = "";
-                  if(type == ElectionEvent) {
+                  if (type == ElectionEvent) {
                     final event = events[index] as ElectionEvent;
                     topic = event.topic;
                     description = event.description;
-                  }
-                  else if (type == PollEvent) {
+                  } else if (type == PollEvent) {
                     final event = events[index] as PollEvent;
                     topic = event.topic;
                     description = event.description;
@@ -94,19 +92,33 @@ class _CompanyEventsState extends State<CompanyEvents> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${topic}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 20 ) ),
+                                  Text('${topic}',
+                                      style: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .cardTextColor,
+                                          fontSize: 20)),
                                   SizedBox(height: 4),
-                                  Text('${description}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 12 ) ),
+                                  Text('${description}',
+                                      style: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .cardTextColor,
+                                          fontSize: 12)),
                                   SizedBox(height: 6),
-                                  Text('${timeStr}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 8 ) ),
+                                  Text('${timeStr}',
+                                      style: TextStyle(
+                                          color: FlutterFlowTheme.of(context)
+                                              .cardTextColor,
+                                          fontSize: 8)),
                                 ],
                               ),
                             ),
                           ),
                           IconButton(
-                            icon: Icon(Icons.navigate_next), onPressed: () {
-                            Get.to(CompanyEvents(cid:"cid"));
-                          },)
+                            icon: Icon(Icons.navigate_next),
+                            onPressed: () {
+                              Get.to(CompanyEvents(cid: "cid"));
+                            },
+                          )
                         ],
                       ),
                     ),
@@ -120,7 +132,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // create event
-
+          Get.to(CreateEvent());
         },
         backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
         child: Icon(

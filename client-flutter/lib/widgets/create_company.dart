@@ -37,17 +37,17 @@ class _CreateCompanyState extends State<CreateCompany> {
                     TextFormField(
                       keyboardType: TextInputType.text,
                       controller: _nameController,
-                      decoration: const InputDecoration(hintText: "Company Name"),
+                      decoration:
+                          const InputDecoration(hintText: "Company Name"),
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       child: TextFormField(
                         controller: _cinController,
-                        decoration:
-                        const InputDecoration(hintText: "Company Identification No. (Optional)"),
+                        decoration: const InputDecoration(
+                            hintText: "Company Identification No. (Optional)"),
                       ),
                     ),
-
                   ],
                 ),
               ),
@@ -55,15 +55,17 @@ class _CreateCompanyState extends State<CreateCompany> {
               Padding(
                 padding: const EdgeInsets.only(top: 16),
                 child: ElevatedButton(
-                  child: _isLoading? const SizedBox(
-                    height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(color:Colors.white)): Text("Add Company"),
-                  onPressed: () async{
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(color: Colors.white))
+                      : Text("Add Company"),
+                  onPressed: () async {
                     setState(() {
                       _isLoading = true;
                     });
-                    try{
+                    try {
                       final uid = FirebaseAuth.instance.currentUser!.uid;
                       final docRef = Company.collection.doc();
                       Company company = Company(
@@ -80,8 +82,8 @@ class _CreateCompanyState extends State<CreateCompany> {
                         _isLoading = false;
                       });
                       Get.snackbar("Success", "Company Created");
-                      Get.back();
-                    }catch(e){
+                      Navigator.pop(context);
+                    } catch (e) {
                       print(e.toString());
                       setState(() {
                         _isLoading = false;

@@ -147,125 +147,131 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     children: [
-                      Align(
-                        alignment: AlignmentDirectional(-0.85, -0.15),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
-                          child: Text(
-                            '${balance}  ETH',
-                            style:
-                                FlutterFlowTheme.of(context).bodyText1.override(
-                                      fontFamily: 'Urbanist',
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                      Expanded(
+                        flex: 1,
+                        child: Align(
+                          alignment: AlignmentDirectional(-0.85, -0.15),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 30, 0, 0),
+                            child: Text(
+                              '${balance}  ETH',
+                              style:
+                                  FlutterFlowTheme.of(context).bodyText1.override(
+                                        fontFamily: 'Urbanist',
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryBackground,
+                                        fontSize: 34,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                            ),
                           ),
                         ),
                       ),
-                      InkWell(
-                        onTap: () async {
-                          print("wiefw");
-                          Get.snackbar(
-                              'Copyed!', 'address is copyed to clipboard!');
-                          await Clipboard.setData(
-                              ClipboardData(text: AppState().address));
-                        },
-                        child: Container(
-                          height: 120,
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: Stack(
-                            children: [
-                              InkWell(
-                                onTap: () async {
-                                  print("wiefw");
-                                  Get.snackbar('Copyed!',
-                                      'address is copyed to clipboard!');
-                                  await Clipboard.setData(
-                                      ClipboardData(text: AppState().address));
-                                },
-                                child: Padding(
-                                  padding: EdgeInsetsDirectional.fromSTEB(
-                                      10, 20, 10, 0),
-                                  child: TextFormField(
-                                    autofocus: true,
-                                    readOnly: true,
-                                    obscureText: false,
-                                    decoration: InputDecoration(
-                                      hintText:
-                                          'Address:\n${AppState().address}',
-                                      hintStyle: FlutterFlowTheme.of(context)
-                                          .bodyText2
+                      Expanded(
+                        flex: 1,
+                        child: InkWell(
+                          onTap: () async {
+                            print("wiefw");
+                            Get.snackbar(
+                                'Copyed!', 'address is copyed to clipboard!');
+                            await Clipboard.setData(
+                                ClipboardData(text: AppState().address));
+                          },
+                          child: Container(
+                            height: 120,
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: Stack(
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    print("wiefw");
+                                    Get.snackbar('Copyed!',
+                                        'address is copyed to clipboard!');
+                                    await Clipboard.setData(
+                                        ClipboardData(text: AppState().address));
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsetsDirectional.fromSTEB(
+                                        10, 20, 10, 0),
+                                    child: TextFormField(
+                                      autofocus: true,
+                                      readOnly: true,
+                                      obscureText: false,
+                                      decoration: InputDecoration(
+                                        hintText:
+                                            'Address:\n${AppState().address}',
+                                        hintStyle: FlutterFlowTheme.of(context)
+                                            .bodyText2
+                                            .override(
+                                              fontFamily: 'Urbanist',
+                                              color: FlutterFlowTheme.of(context)
+                                                  .secondaryBackground,
+                                            ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.black,
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Colors.black,
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        errorBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        focusedErrorBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: Color(0x00000000),
+                                            width: 1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyText1
                                           .override(
                                             fontFamily: 'Urbanist',
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
                                           ),
-                                      enabledBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Colors.black,
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Colors.black,
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      errorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Color(0x00000000),
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      focusedErrorBorder: OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                          color: Color(0x00000000),
-                                          width: 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                    ),
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyText1
-                                        .override(
-                                          fontFamily: 'Urbanist',
-                                          color: FlutterFlowTheme.of(context)
-                                              .secondaryBackground,
-                                        ),
-                                    maxLines: 3,
-                                    minLines: 3,
-                                  ),
-                                ),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  print("wiefw");
-                                  Get.snackbar('Copyed!',
-                                      'address is copyed to clipboard!');
-                                  await Clipboard.setData(
-                                      ClipboardData(text: AppState().address));
-                                },
-                                child: Align(
-                                  alignment: AlignmentDirectional(0.9, -0.4),
-                                  child: Padding(
-                                    padding: EdgeInsetsDirectional.fromSTEB(
-                                        0, 0, 0, 0),
-                                    child: Icon(
-                                      Icons.content_copy,
-                                      color: FlutterFlowTheme.of(context)
-                                          .secondaryBackground,
-                                      size: 18,
+                                      maxLines: 3,
+                                      minLines: 3,
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                                InkWell(
+                                  onTap: () async {
+                                    print("wiefw");
+                                    Get.snackbar('Copyed!',
+                                        'address is copyed to clipboard!');
+                                    await Clipboard.setData(
+                                        ClipboardData(text: AppState().address));
+                                  },
+                                  child: Align(
+                                    alignment: AlignmentDirectional(0.9, -0.4),
+                                    child: Padding(
+                                      padding: EdgeInsetsDirectional.fromSTEB(
+                                          0, 0, 0, 0),
+                                      child: Icon(
+                                        Icons.content_copy,
+                                        color: FlutterFlowTheme.of(context)
+                                            .secondaryBackground,
+                                        size: 18,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
