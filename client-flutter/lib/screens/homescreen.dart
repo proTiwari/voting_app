@@ -8,11 +8,14 @@ import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import '../flutterflow/flutter_flow_theme.dart';
+import '../objects/ElectionEvent.dart';
+import '../objects/PollEvent.dart';
 import '../services/code_generator.dart';
 import 'package:flutter_share/flutter_share.dart';
 import '../services/deeplink_service.dart';
 import '../services/contract_service.dart';
 import '../services/firestore_functions.dart';
+import 'event_details.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -28,13 +31,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     initFunction();
     deeplink();
-    getActiveEvents();
+    refresh();
   }
 
   List activeEvents = [];
 
   getActiveEvents() async {
     activeEvents = await FirestoreFunctions().getActiveEvents();
+    setState(() {
+      activeEvents;
+    });
+  }
+
+  Future<void> refresh() async {
+    await getActiveEvents();
+    await initFunction();
   }
 
   String? referLink = '';
@@ -65,8 +76,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double balance = 1.0;
   String walletAddress = "";
   initFunction() async {
-    print("iwoeifjwoeijf");
-
     try {
       ContractService contractService = await ContractService.build();
       //get wallet address
@@ -76,21 +85,15 @@ class _HomeScreenState extends State<HomeScreen> {
         walletAddress;
       });
       AppState().address = walletAddress;
-      print("iwoeifjwoeijf 1");
 
       // get balance
       EtherAmount am = await contractService.getBalance();
-      print("iwoeifjwoeijf :am $am");
       balance = am.getValueInUnit(EtherUnit.ether);
-      print("iwoeifjwoeijf");
-      print(
-          "amount: ${am}; balance: ${balance}; walletAddress: ${wallet.address.hex}");
       setState(() {
         balance;
         walletAddress;
       });
     } catch (e) {
-      print("iwoeifjwoeijf");
       print("homescreen_error: ${e.toString()}");
     }
   }
@@ -132,137 +135,182 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: SafeArea(
         child: Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              IconButton(
-                icon: Icon(Icons.logout),
-                onPressed: () {
-                  FirebaseAuth.instance.signOut();
-                },
-              ),
-              GestureDetector(
-                onTap: () async {
-                  Get.snackbar('Copied!', 'address is copied to clipboard!');
-                  await Clipboard.setData(
-                      ClipboardData(text: AppState().address));
-                },
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  elevation: 0,
-                  color: FlutterFlowTheme.of(context).cardBackgroundColor,
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Expanded(
-                      flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Ethereum Wallet',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyText1
-                                      .override(
-                                        fontFamily: 'Urbanist',
-                                        color: FlutterFlowTheme.of(context)
-                                            .cardTextColor,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                                Icon(Icons.copy),
-                              ],
-                            ),
-                            SizedBox(height: 10),
-                            Text(
-                              AppState().address,
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyText1
-                                  .override(
-                                    fontFamily: 'Urbanist',
-                                    color: FlutterFlowTheme.of(context)
-                                        .cardTextColor,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
+          body: RefreshIndicator(
+            onRefresh: () {
+              return refresh();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  onPressed: () {
+                    FirebaseAuth.instance.signOut();
+                  },
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    Get.snackbar('Copied!', 'address is copied to clipboard!');
+                    await Clipboard.setData(
+                        ClipboardData(text: AppState().address));
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    elevation: 0,
+                    color: FlutterFlowTheme.of(context).cardBackgroundColor,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Ethereum Wallet',
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyText1
+                                        .override(
+                                          fontFamily: 'Urbanist',
+                                          color: FlutterFlowTheme.of(context)
+                                              .cardTextColor,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.w600,
+                                        ),
                                   ),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              '$balance  ETH',
-                              style: FlutterFlowTheme.of(context)
-                                  .bodyText1
-                                  .override(
-                                    fontFamily: 'Urbanist',
-                                    color: FlutterFlowTheme.of(context)
-                                        .cardTextColor,
-                                    fontSize: 34,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                            ),
-                          ],
+                                  Icon(Icons.copy),
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Text(
+                                AppState().address,
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyText1
+                                    .override(
+                                      fontFamily: 'Urbanist',
+                                      color: FlutterFlowTheme.of(context)
+                                          .cardTextColor,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                              SizedBox(height: 6),
+                              Text(
+                                '$balance  ETH',
+                                style: FlutterFlowTheme.of(context)
+                                    .bodyText1
+                                    .override(
+                                      fontFamily: 'Urbanist',
+                                      color: FlutterFlowTheme.of(context)
+                                          .cardTextColor,
+                                      fontSize: 34,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Text(
-                'Events',
-                style: FlutterFlowTheme.of(context).bodyText1.override(
-                      fontFamily: 'Urbanist',
-                      color: FlutterFlowTheme.of(context).darkBGstatic,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              Expanded(
-                flex: 1,
-                child: ListView.builder(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  itemCount: 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Align(
-                      alignment: AlignmentDirectional(-0.05, -0.8),
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                        child: Container(
-                            width: MediaQuery.of(context).size.width * 0.91,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(220, 59, 58, 58),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Column(
+                SizedBox(height: 20),
+                Text(
+                  'Events',
+                  style: FlutterFlowTheme.of(context).bodyText1.override(
+                        fontFamily: 'Urbanist',
+                        color: FlutterFlowTheme.of(context).darkBGstatic,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    itemCount: activeEvents.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      var type = activeEvents[index].runtimeType;
+                      String topic = "";
+                      String description = "";
+                      String timeStr = "";
+                      if (type == ElectionEvent) {
+                        final event = activeEvents[index] as ElectionEvent;
+                        topic = event.topic;
+                        description = event.description;
+                      } else if (type == PollEvent) {
+                        final event = activeEvents[index] as PollEvent;
+                        topic = event.topic;
+                        description = event.description;
+                      }
+                      return GestureDetector(
+                        onTap: () async {
+                          Get.to(EventDetails(activeEvents[index]));
+                        },
+                        child: Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          margin: const EdgeInsets.all(10),
+                          elevation: 0,
+                          color: FlutterFlowTheme.of(context).cardBackgroundColor,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    "${activeEvents[index].topic}",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold),
+                                Icon(
+                                  Icons.how_to_vote,
+                                  color: FlutterFlowTheme.of(context).primaryColor,
+                                  size: 24,
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 16.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text('${topic}',
+                                            style: TextStyle(
+                                                color: FlutterFlowTheme.of(context)
+                                                    .cardTextColor,
+                                                fontSize: 20)),
+                                        SizedBox(height: 4),
+                                        Text('${description}',
+                                            style: TextStyle(
+                                                color: FlutterFlowTheme.of(context)
+                                                    .cardTextColor,
+                                                fontSize: 12)),
+                                        SizedBox(height: 6),
+                                        Text('${timeStr}',
+                                            style: TextStyle(
+                                                color: FlutterFlowTheme.of(context)
+                                                    .cardTextColor,
+                                                fontSize: 8)),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                                Text("${activeEvents[index].description}"),
-                                Container()
+                                Icon(Icons.navigate_next),
                               ],
-                            )),
-                      ),
-                    );
-                  },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ]),
+              ]),
+            ),
           ),
         ),
       ),

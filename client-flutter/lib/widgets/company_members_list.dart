@@ -38,88 +38,93 @@ class _CompanyMembersState extends State<CompanyMembers> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.only(top: 0.0),
-        child: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: ListView.builder(
-                padding: EdgeInsets.zero,
-                shrinkWrap: true,
-                scrollDirection: Axis.vertical,
-                itemCount: members.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    margin: const EdgeInsets.all(10),
-                    elevation: 0,
-                    color: FlutterFlowTheme.of(context).cardBackgroundColor,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.person,
-                            color: FlutterFlowTheme.of(context).primaryColor,
-                            size: 24,
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(members[index].name,
-                                      style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .cardTextColor,
-                                          fontSize: 20)),
-                                  SizedBox(height: 4),
-                                  Text(members[index].email,
-                                      style: TextStyle(
-                                          color: FlutterFlowTheme.of(context)
-                                              .cardTextColor,
-                                          fontSize: 12)),
-                                  SizedBox(height: 8),
-                                  widget.company.admin == members[index].uid
-                                      ? Container(
-                                    width: 70,
-                                    height: 30,
-                                    decoration: BoxDecoration(
-                                      color: FlutterFlowTheme.of(context).cardTextColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        'Admin',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyText1
-                                            .override(
-                                          fontFamily: 'Urbanist',
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getAllCompanyMembers();
+        },
+        child: Padding(
+          padding: const EdgeInsets.only(top: 0.0),
+          child: Column(
+            children: [
+              Expanded(
+                flex: 1,
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  scrollDirection: Axis.vertical,
+                  itemCount: members.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      margin: const EdgeInsets.all(10),
+                      elevation: 0,
+                      color: FlutterFlowTheme.of(context).cardBackgroundColor,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.person,
+                              color: FlutterFlowTheme.of(context).primaryColor,
+                              size: 24,
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 16.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(members[index].name,
+                                        style: TextStyle(
+                                            color: FlutterFlowTheme.of(context)
+                                                .cardTextColor,
+                                            fontSize: 20)),
+                                    SizedBox(height: 4),
+                                    Text(members[index].email,
+                                        style: TextStyle(
+                                            color: FlutterFlowTheme.of(context)
+                                                .cardTextColor,
+                                            fontSize: 12)),
+                                    SizedBox(height: 8),
+                                    widget.company.admin == members[index].uid
+                                        ? Container(
+                                      width: 70,
+                                      height: 30,
+                                      decoration: BoxDecoration(
+                                        color: FlutterFlowTheme.of(context).cardTextColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          'Admin',
+                                          style: FlutterFlowTheme.of(context)
+                                              .bodyText1
+                                              .override(
+                                            fontFamily: 'Urbanist',
+                                            color: Colors.white,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                      : Container(),
-                                ],
+                                    )
+                                        : Container(),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

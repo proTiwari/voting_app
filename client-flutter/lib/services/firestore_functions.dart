@@ -86,7 +86,7 @@ class FirestoreFunctions {
           startTimestamp: startTimestamp,
           endTimestamp: endTimestamp,
           cid: cid,
-          voters: voters,
+          voters: company.users,
           creationTimestamp: Timestamp.now(),
           companyData: company.getCompanySummary(),
         );
@@ -127,7 +127,7 @@ class FirestoreFunctions {
           startTimestamp: startTimestamp,
           endTimestamp: endTimestamp,
           cid: cid,
-          voters: voters,
+          voters: company.users,
           creationTimestamp: Timestamp.now(),
           companyData: company.getCompanySummary(),
         );
