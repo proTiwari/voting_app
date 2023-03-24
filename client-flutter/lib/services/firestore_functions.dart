@@ -1,5 +1,4 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/objects/AppUser.dart';
@@ -48,7 +47,7 @@ class FirestoreFunctions {
       empData: {
         '$uid': EmployeeSummary(
           uid: uid!,
-          name: name,
+          name: FirebaseAuth.instance.currentUser!.displayName!,
           email: FirebaseAuth.instance.currentUser!.email!,
           eid: eid,
         )
@@ -253,7 +252,7 @@ class FirestoreFunctions {
     });
 
     // send email with sendgrid_mailer library
-    final mailer = Mailer('SENDGRID API KEY');
+    final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
     const fromAddress = Address('proshubham5@gmail.com');
     final content = Content('text/plain', 'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
@@ -304,5 +303,11 @@ class FirestoreFunctions {
       invites.add(Invite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
     }
     return invites;
+  }
+
+  // function to get all members of a company
+  Future<List<EmployeeSummary>> getCompanyMembers(String cid) async {
+    var snapshot = await Company.collection.doc(cid).get();
+    return snapshot.data()!.empData.values.toList();
   }
 }

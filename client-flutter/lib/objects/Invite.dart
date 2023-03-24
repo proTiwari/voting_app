@@ -3,7 +3,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:voting_app/objects/EmployeeSummary.dart';
-
 import 'CompanySummary.dart';
 
 enum InviteStatus { pending, accepted, rejected }

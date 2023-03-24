@@ -68,7 +68,7 @@ class _CompaniesState extends State<Companies> {
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     onTap: () {
-                      Get.to(CompanyDetails(companies[index].cid));
+                      Get.to(CompanyDetails(companies[index]));
                     },
                       child: CompanyCard(companies[index].getCompanySummary())
                   );
