@@ -33,8 +33,7 @@ class ElectionEvent {
 
   factory ElectionEvent.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? options
-      ) {
+      SnapshotOptions? options) {
     Map data = snapshot.data() as Map;
     return ElectionEvent(
       evid: data['evid'] ?? '',
@@ -42,7 +41,8 @@ class ElectionEvent {
       description: data['description'] ?? '',
       cid: data['cid'] ?? '',
       voters: data['voters'] ?? [],
-      candidates: data['candidates'] ?? [],
+      candidates:
+          (data['candidates'] as List?)?.map((i) => i as String).toList() ?? [],
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       startTimestamp: data['startTimestamp'] ?? Timestamp.now(),
       endTimestamp: data['endTimestamp'] ?? Timestamp.now(),
@@ -67,8 +67,8 @@ class ElectionEvent {
     };
   }
 
-  static CollectionReference<ElectionEvent> get collection => FirebaseFirestore.instance.collection('events').withConverter(
-      fromFirestore: ElectionEvent.fromFirestore,
-      toFirestore: (ElectionEvent event, _) => event.toFirestore()
-  );
+  static CollectionReference<ElectionEvent> get collection =>
+      FirebaseFirestore.instance.collection('events').withConverter(
+          fromFirestore: ElectionEvent.fromFirestore,
+          toFirestore: (ElectionEvent event, _) => event.toFirestore());
 }

@@ -13,7 +13,8 @@ class CompanyEvents extends StatefulWidget {
   Company companydata;
   CompanyEvents({
     super.key,
-    required this.companydata, required String cid,
+    required this.companydata,
+    required String cid,
   });
 
   @override
@@ -30,9 +31,10 @@ class _CompanyEventsState extends State<CompanyEvents> {
   List<dynamic> events = [];
 
   getAllCompanyEvents() async {
+    print(widget.companydata.cid!);
     events =
         await FirestoreFunctions().getAllCompanyEvents(widget.companydata.cid!);
-    print("events: ${events}");
+    print("events:sdsd ${events}");
   }
 
   @override
@@ -137,8 +139,9 @@ class _CompanyEventsState extends State<CompanyEvents> {
         onPressed: () {
           // create event
           print("jnkjnknk");
-          Get.to(CreateEvent(empData: widget.companydata.empData, companydata: widget.companydata));
-         
+          Get.to(CreateEvent(
+              empData: widget.companydata.empData,
+              companydata: widget.companydata));
         },
         backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
         child: Icon(

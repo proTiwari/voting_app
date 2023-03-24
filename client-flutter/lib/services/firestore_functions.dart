@@ -32,7 +32,6 @@ class FirestoreFunctions {
     await AppUser.collection.doc(user.uid).set(user);
   }
 
-
   // Create a new company in the database
   Future<void> createCompany(String cin, String name, String eid) async {
     final companyDocRef = Company.collection.doc();
@@ -96,8 +95,7 @@ class FirestoreFunctions {
         });
 
         return event;
-      }
-      else {
+      } else {
         throw Exception('Company does not exist');
       }
     });
@@ -137,8 +135,7 @@ class FirestoreFunctions {
         });
 
         return event;
-      }
-      else {
+      } else {
         throw Exception('Company does not exist');
       }
     });
@@ -149,17 +146,19 @@ class FirestoreFunctions {
     final eventsCollRef = FirebaseFirestore.instance.collection('events');
     List<dynamic> events = [];
     Timestamp now = Timestamp.now();
-    var snapshot = await eventsCollRef.where('endTimestamp', isGreaterThan: now).get();
-    final filteredDocs = snapshot.docs.where((doc) => now.compareTo(doc.data()['startTimestamp'] as Timestamp) >= 0);
+    var snapshot =
+        await eventsCollRef.where('endTimestamp', isGreaterThan: now).get();
+    final filteredDocs = snapshot.docs.where(
+        (doc) => now.compareTo(doc.data()['startTimestamp'] as Timestamp) >= 0);
     for (var doc in filteredDocs) {
-      if(doc.data()['type'] == 'poll') {
+      if (doc.data()['type'] == 'poll') {
         PollEvent event = PollEvent.fromFirestore(doc, null);
-        if(event.voters.contains(uid)) {
+        if (event.voters.contains(uid)) {
           events.add(event);
         }
       } else if (doc.data()['type'] == 'election') {
         ElectionEvent event = ElectionEvent.fromFirestore(doc, null);
-        if(event.voters.contains(uid) || event.candidates.contains(uid)) {
+        if (event.voters.contains(uid) || event.candidates.contains(uid)) {
           events.add(event);
         }
       }
@@ -170,14 +169,15 @@ class FirestoreFunctions {
   // get all events from the collection events where cid is equal to the given company id
   Future<List<dynamic>> getAllCompanyEvents(String cid) async {
     final eventsCollRef = FirebaseFirestore.instance.collection('events');
-    List<dynamic> events = [];
+    List<ElectionEvent> events = [];
     var snapshot = await eventsCollRef.where('cid', isEqualTo: cid).get();
     for (var doc in snapshot.docs) {
-      if(doc.data()['type'] == 'poll') {
-        events.add(PollEvent.fromFirestore(doc, null));
-      } else if (doc.data()['type'] == 'election') {
-        events.add(ElectionEvent.fromFirestore(doc, null));
-      }
+      // if(doc.data()['type'] == 'poll') {
+      //   events.add(PollEvent.fromFirestore(doc, null));
+      // } else if (doc.data()['type'] == 'election') {
+      //   events.add(ElectionEvent.fromFirestore(doc, null));
+      // }
+      events.add(ElectionEvent.fromFirestore(doc, null));
     }
     return events;
   }
@@ -185,7 +185,8 @@ class FirestoreFunctions {
   // get all companies from the collection companies where uid is equal to firebase user uid
   Future<List<Company>> getCompanies() async {
     List<Company> companies = [];
-    var snapshot = await Company.collection.where('users', arrayContains: uid).get();
+    var snapshot =
+        await Company.collection.where('users', arrayContains: uid).get();
     for (var doc in snapshot.docs) {
       companies.add(doc.data());
     }
@@ -196,9 +197,9 @@ class FirestoreFunctions {
   Future<dynamic> getEvent(String evid) async {
     final eventsCollRef = FirebaseFirestore.instance.collection('events');
     var snapshot = await eventsCollRef.doc(evid).get();
-    if(snapshot.data() == null) return null;
+    if (snapshot.data() == null) return null;
 
-    if(snapshot.data()!['type'] == 'poll') {
+    if (snapshot.data()!['type'] == 'poll') {
       return PollEvent.fromFirestore(snapshot, null);
     } else if (snapshot.data()!['type'] == 'election') {
       return ElectionEvent.fromFirestore(snapshot, null);
@@ -219,11 +220,12 @@ class FirestoreFunctions {
 
   // function to invite a user to a company
   Future<void> inviteUser(String companyEmail, String cid, String eid) async {
-    if(uid == null) return;
+    if (uid == null) return;
     final docRef = Invite.collection.doc();
 
     // run transaction and get company data
-    final invitation = await firestore.runTransaction<Invite>((transaction) async {
+    final invitation =
+        await firestore.runTransaction<Invite>((transaction) async {
       final companyDoc = await transaction.get(Company.collection.doc(cid));
       if (companyDoc.exists) {
         final company = companyDoc.data() as Company;
@@ -241,12 +243,10 @@ class FirestoreFunctions {
               name: (await getUser())!.name,
               email: companyEmail,
               eid: eid,
-            )
-        );
+            ));
         transaction.set(docRef, invite);
         return invite;
-      }
-      else {
+      } else {
         throw Exception('Company does not exist');
       }
     });
@@ -255,13 +255,16 @@ class FirestoreFunctions {
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
     const fromAddress = Address('proshubham5@gmail.com');
-    final content = Content('text/plain', 'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
-        'https://evotingapp.page.link/invite-member/${invitation.inviteId}');
-    final subject = 'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
+    final content = Content(
+        'text/plain',
+        'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
+            'https://evotingapp.page.link/invite-member/${invitation.inviteId}');
+    final subject =
+        'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);
 
     final email =
-    Email([personalization], fromAddress, subject, content: [content]);
+        Email([personalization], fromAddress, subject, content: [content]);
     mailer.send(email).then((result) {
       print(result);
     }).catchError((onError) {
@@ -271,9 +274,10 @@ class FirestoreFunctions {
 
   // function to accept an invite
   Future<void> acceptInvite(Invite invite) async {
-    if(uid == null) return;
+    if (uid == null) return;
     await firestore.runTransaction((transaction) async {
-      final inviteDoc = await transaction.get(Invite.collection.doc(invite.inviteId));
+      final inviteDoc =
+          await transaction.get(Invite.collection.doc(invite.inviteId));
       final userDoc = await transaction.get(AppUser.collection.doc(uid));
       if (userDoc.exists && inviteDoc.exists) {
         final invite = inviteDoc.data() as Invite;
@@ -281,7 +285,7 @@ class FirestoreFunctions {
           'status': InviteStatus.accepted.name,
           'actionTimestamp': Timestamp.now()
         });
-        if(userDoc.data()!.companies.contains(invite.cid)) return;
+        if (userDoc.data()!.companies.contains(invite.cid)) return;
         transaction.update(AppUser.collection.doc(uid), {
           'companies': FieldValue.arrayUnion([invite.cid]),
           'companyData.${invite.cid}': invite.companyData.toFirestore(),
@@ -290,8 +294,7 @@ class FirestoreFunctions {
           'users': FieldValue.arrayUnion([uid]),
           'empData.$uid': invite.employeeData.toFirestore(),
         });
-      }
-      else {
+      } else {
         throw Exception('Invite does not exist');
       }
     });
@@ -299,7 +302,7 @@ class FirestoreFunctions {
 
   // function to decline an invite
   Future<void> declineInvite(String inviteId) async {
-    if(uid == null) return;
+    if (uid == null) return;
     await Invite.collection.doc(inviteId).update({
       'status': InviteStatus.rejected.name,
       'actionTimestamp': Timestamp.now()
@@ -311,7 +314,8 @@ class FirestoreFunctions {
     List<Invite> invites = [];
     var snapshot = await Invite.collection.where('uid', isEqualTo: uid).get();
     for (var doc in snapshot.docs) {
-      invites.add(Invite.fromFirestore(doc as DocumentSnapshot<Map<String, dynamic>>, null));
+      invites.add(Invite.fromFirestore(
+          doc as DocumentSnapshot<Map<String, dynamic>>, null));
     }
     return invites;
   }

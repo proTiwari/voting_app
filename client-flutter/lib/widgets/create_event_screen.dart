@@ -63,6 +63,10 @@ class _CreateEventState extends State<CreateEvent> {
       setState(() {
         candidateList.add(Candidate(name: element.value.name, avatar: ''));
       });
+      
+    });
+    candidateList.forEach((element) {
+      print("element: ${element.name}");
     });
   }
 
