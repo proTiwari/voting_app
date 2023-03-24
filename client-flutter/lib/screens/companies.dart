@@ -73,7 +73,6 @@ class _CompaniesState extends State<Companies> {
                     },
                       child: CompanyCard(companies[index])
                   );
-               
                 },
               ),
             ),

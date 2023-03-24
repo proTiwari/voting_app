@@ -10,10 +10,10 @@ import '../services/firestore_functions.dart';
 import '../widgets/create_event_screen.dart';
 
 class CompanyEvents extends StatefulWidget {
-  Company companydata;
-  CompanyEvents({
+  final Company company;
+  const CompanyEvents({
     super.key,
-    required this.companydata, required String cid,
+    required this.company,
   });
 
   @override
@@ -31,7 +31,10 @@ class _CompanyEventsState extends State<CompanyEvents> {
 
   getAllCompanyEvents() async {
     events =
-        await FirestoreFunctions().getAllCompanyEvents(widget.companydata.cid!);
+        await FirestoreFunctions().getAllCompanyEvents(widget.company.cid);
+    setState(() {
+      events;
+    });
     print("events: ${events}");
   }
 
@@ -39,23 +42,11 @@ class _CompanyEventsState extends State<CompanyEvents> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.only(top: 50.0),
+        padding: const EdgeInsets.only(top: 0.0),
         child: Column(
           children: [
-            Align(
-              alignment: AlignmentDirectional(-0.85, 0),
-              child: Text(
-                'Events',
-                style: FlutterFlowTheme.of(context).bodyText1.override(
-                      fontFamily: 'Urbanist',
-                      color: FlutterFlowTheme.of(context).darkBGstatic,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-            ),
-            Container(
-              height: 360,
+            Expanded(
+              flex: 1,
               child: ListView.builder(
                 padding: EdgeInsets.zero,
                 shrinkWrap: true,
@@ -87,7 +78,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
                       child: Row(
                         children: [
                           Icon(
-                            Icons.business,
+                            Icons.how_to_vote,
                             color: FlutterFlowTheme.of(context).primaryColor,
                             size: 24,
                           ),
@@ -136,9 +127,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // create event
-          print("jnkjnknk");
-          Get.to(CreateEvent(empData: widget.companydata.empData, companydata: widget.companydata));
-         
+          Get.to(CreateEvent(company: widget.company));
         },
         backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
         child: Icon(
