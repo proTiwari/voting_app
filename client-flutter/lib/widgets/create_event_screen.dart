@@ -52,6 +52,8 @@ class _CreateEventState extends State<CreateEvent> {
   @override
   void initState() {
     super.initState();
+    selectCandidateList = [];
+    candidateList = [];
     getCandidates();
   }
 
@@ -88,6 +90,11 @@ class _CreateEventState extends State<CreateEvent> {
 
     var datetime = DateTime(picked!.hour, picked.minute);
     _setstarttime = Timestamp.fromDate(datetime);
+    print(datetime);
+    print(picked.hour);
+    print(picked.minute);
+    print("ggg: ${_setstarttime}");
+
     if (picked != null)
       setState(() {
         selectedTime = picked;
@@ -96,7 +103,8 @@ class _CreateEventState extends State<CreateEvent> {
         _time = _hour + ' : ' + _minute;
         _starttimeController.text = _time;
         _starttimeController.text = df.formatDate(
-            DateTime(2019, 08, 1, selectedTime.hour, selectedTime.minute),
+            DateTime(DateTime.now().year, DateTime.now().month,
+                DateTime.now().day, selectedTime.hour, selectedTime.minute),
             [df.hh, ':', df.nn, " ", df.am]).toString();
       });
   }
@@ -109,6 +117,7 @@ class _CreateEventState extends State<CreateEvent> {
 
     print(picked!.hour);
     print(picked.minute);
+
     var datetime = DateTime(picked!.hour, picked.minute);
     _setendtime = Timestamp.fromDate(datetime);
     if (picked != null)
@@ -118,8 +127,10 @@ class _CreateEventState extends State<CreateEvent> {
         _minute = selectedTime.minute.toString();
         _time = _hour + ' : ' + _minute;
         _endtimeController.text = _time;
+
         _endtimeController.text = df.formatDate(
-            DateTime(2019, 08, 1, selectedTime.hour, selectedTime.minute),
+            DateTime(DateTime.now().year, DateTime.now().month,
+                DateTime.now().day, selectedTime.hour, selectedTime.minute),
             [df.hh, ':', df.nn, " ", df.am]).toString();
       });
   }

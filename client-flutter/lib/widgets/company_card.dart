@@ -50,7 +50,8 @@ class CompanyCard extends StatelessWidget {
                             color: FlutterFlowTheme.of(context).cardTextColor,
                             fontSize: 20)),
                     const SizedBox(height: 6),
-                    _companySummary.admin == FirebaseAuth.instance.currentUser!.uid
+                    _companySummary.admin ==
+                            FirebaseAuth.instance.currentUser!.uid
                         ? Container(
                             width: 70,
                             height: 30,
@@ -80,7 +81,10 @@ class CompanyCard extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.navigate_next),
               onPressed: () {
-                Get.to(CompanyEvents(companydata: _companySummary, cid: _companySummary.cid,));
+                Get.to(CompanyEvents(
+                  companydata: _companySummary,
+                  cid: _companySummary.cid,
+                ));
               },
             )
           ],
