@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/objects/Company.dart';
@@ -133,7 +134,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: widget.company.admin == FirebaseAuth.instance.currentUser!.uid ? FloatingActionButton(
         onPressed: () {
           // create event
           Get.to(CreateEvent(company: widget.company));
@@ -144,7 +145,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
           color: FlutterFlowTheme.of(context).white,
           size: 24,
         ),
-      ),
+      ) : null,
     );
   }
 }
