@@ -1,23 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:date_format/date_format.dart' as df;
 import 'package:get/get.dart';
-import 'package:voting_app/objects/ElectionEvent.dart';
-import 'package:voting_app/objects/EmployeeSummary.dart';
-import 'package:voting_app/services/app_state.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import 'package:filter_list/filter_list.dart';
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/Company.dart';
-import '../objects/CompanySummary.dart';
-import '../objects/PollEvent.dart';
 
 class CreateEvent extends StatefulWidget {
-  Map<String, EmployeeSummary> empData;
-  Company companydata;
-  CreateEvent({Key? key, required this.empData, required this.companydata})
+  Company company;
+  CreateEvent({Key? key, required this.company})
       : super(key: key);
 
   @override
@@ -28,26 +21,19 @@ class _CreateEventState extends State<CreateEvent> {
   bool _isLoading = false;
   List<String> list = <String>['Select type', 'election', 'poll'];
   String dropdownValue = 'Select type';
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _descriptionController = TextEditingController();
-  double _height = Get.height;
-  double _width = Get.width;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final double _height = Get.height;
+  final double _width = Get.width;
 
-  late String _setTime, _setDate;
+  DateTimeRange? _selectedDateRange;
+  TimeOfDay? _selectedStartTimeOfDay;
+  TimeOfDay? _selectedEndTimeOfDay;
 
-  late String _hour, _minute, _time;
-
-  late String dateTime;
-  late Timestamp _setstarttime;
-  late Timestamp _setendtime;
-
-  DateTime selectedDate = DateTime.now();
-
-  TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
-
-  TextEditingController _dateController = TextEditingController();
-  TextEditingController _starttimeController = TextEditingController();
-  TextEditingController _endtimeController = TextEditingController();
+  String? _startDateText = null;
+  String? _endDateText = null;
+  String? _startTimeText = null;
+  String? _endTimeText = null;
 
   @override
   void initState() {
@@ -58,10 +44,10 @@ class _CreateEventState extends State<CreateEvent> {
   }
 
   getCandidates() {
-    widget.empData.entries.forEach((element) {
-      print("element: ${element.value.name}");
+    widget.company.empData.values.forEach((element) {
+      print("element: ${element.name}");
       setState(() {
-        candidateList.add(Candidate(name: element.value.name, avatar: ''));
+        candidateList.add(Candidate(uid: element.uid, name: element.name, avatar: ''));
       });
       
     });
@@ -70,73 +56,64 @@ class _CreateEventState extends State<CreateEvent> {
     });
   }
 
-  Future<Null> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        initialDatePickerMode: DatePickerMode.day,
-        firstDate: DateTime(2015),
-        lastDate: DateTime(2101));
-    if (picked != null) {
-      setState(() {
-        selectedDate = picked;
-        _dateController.text =
-            df.formatDate(selectedDate, [df.dd, '-', df.mm, '-', df.yyyy]);
-      });
+  Future<void> _selectstartTime(BuildContext context) async {
+    _selectedStartTimeOfDay = await showTimePicker(
+      context: context,
+      initialTime: _selectedStartTimeOfDay ?? const TimeOfDay(hour: 00, minute: 00),
+    );
+
+    if(_selectedStartTimeOfDay != null && _selectedDateRange != null) {
+      _startTimeText = df.formatDate(
+          DateTime(_selectedDateRange!.end.year, _selectedDateRange!.end.month,
+              _selectedDateRange!.end.day, _selectedStartTimeOfDay!.hour, _selectedStartTimeOfDay!.minute),
+          [df.hh, ':', df.nn, " ", df.am]).toString();
     }
+
+    setState(() {
+      _selectedStartTimeOfDay;
+      _startTimeText;
+    });
   }
 
-  Future<Null> _selectstartTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+  Future<void> _selectendTime(BuildContext context) async {
+    _selectedEndTimeOfDay = await showTimePicker(
       context: context,
-      initialTime: selectedTime,
+      initialTime: _selectedEndTimeOfDay ?? const TimeOfDay(hour: 00, minute: 00),
     );
 
-    var datetime = DateTime(picked!.hour, picked.minute);
-    _setstarttime = Timestamp.fromDate(datetime);
-    print(datetime);
-    print(picked.hour);
-    print(picked.minute);
-    print("ggg: ${_setstarttime}");
+    if(_selectedEndTimeOfDay != null && _selectedDateRange != null) {
+      _endTimeText = df.formatDate(
+          DateTime(_selectedDateRange!.end.year, _selectedDateRange!.end.month,
+              _selectedDateRange!.end.day, _selectedEndTimeOfDay!.hour, _selectedEndTimeOfDay!.minute),
+          [df.hh, ':', df.nn, " ", df.am]).toString();
+    }
 
-    if (picked != null)
-      setState(() {
-        selectedTime = picked;
-        _hour = selectedTime.hour.toString();
-        _minute = selectedTime.minute.toString();
-        _time = _hour + ' : ' + _minute;
-        _starttimeController.text = _time;
-        _starttimeController.text = df.formatDate(
-            DateTime(DateTime.now().year, DateTime.now().month,
-                DateTime.now().day, selectedTime.hour, selectedTime.minute),
-            [df.hh, ':', df.nn, " ", df.am]).toString();
-      });
+    setState(() {
+      _selectedEndTimeOfDay = _selectedEndTimeOfDay;
+      _endTimeText;
+    });
   }
 
-  Future<Null> _selectendTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: selectedTime,
+  // select date range
+  Future<void> _selectDateRange(BuildContext context) async {
+    _selectedDateRange = await showDateRangePicker(
+        context: context,
+        initialDateRange: DateTimeRange(start: DateTime.now(), end: DateTime.now().add(const Duration(days: 7))),
+        firstDate: DateTime(2023),
+        lastDate: DateTime(2025)
     );
 
-    print(picked!.hour);
-    print(picked.minute);
-
-    var datetime = DateTime(picked!.hour, picked.minute);
-    _setendtime = Timestamp.fromDate(datetime);
-    if (picked != null)
-      setState(() {
-        selectedTime = picked;
-        _hour = selectedTime.hour.toString();
-        _minute = selectedTime.minute.toString();
-        _time = _hour + ' : ' + _minute;
-        _endtimeController.text = _time;
-
-        _endtimeController.text = df.formatDate(
-            DateTime(DateTime.now().year, DateTime.now().month,
-                DateTime.now().day, selectedTime.hour, selectedTime.minute),
-            [df.hh, ':', df.nn, " ", df.am]).toString();
-      });
+    if(_selectedDateRange != null) {
+      _startDateText =
+          df.formatDate(_selectedDateRange!.start, [df.dd, '-', df.mm, '-', df.yyyy]);
+      _endDateText =
+          df.formatDate(_selectedDateRange!.end, [df.dd, '-', df.mm, '-', df.yyyy]);
+    }
+    setState(() {
+      _selectedDateRange = _selectedDateRange;
+      _startDateText;
+      _endDateText;
+    });
   }
 
   List<Candidate> selectCandidateList = [];
@@ -157,7 +134,7 @@ class _CreateEventState extends State<CreateEvent> {
       validateSelectedItem: (list, val) => list!.contains(val),
       controlButtons: [ControlButtonType.Reset],
       onItemSearch: (user, query) {
-        return user.name!.toLowerCase().contains(query.toLowerCase());
+        return user.name.toLowerCase().contains(query.toLowerCase());
       },
       onApplyButtonClick: (list) {
         setState(() {
@@ -268,9 +245,9 @@ class _CreateEventState extends State<CreateEvent> {
                           ),
                         ),
                       ),
-                      selectCandidateList.length == 0
+                      selectCandidateList.isEmpty
                           ? Container()
-                          : Container(
+                          : SizedBox(
                               height: 150,
                               child: GridView.builder(
                                   gridDelegate:
@@ -296,54 +273,73 @@ class _CreateEventState extends State<CreateEvent> {
                                     );
                                   }),
                             ),
-                      InkWell(
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: ElevatedButton(onPressed: () {
+                          _selectDateRange(context);
+                        }, child: const Text("Select Date Range")),
+                      ),
+                      _selectedDateRange != null ? InkWell(
                         onTap: () {
                           _selectstartTime(context);
                         },
-                        child: Container(
-                          width: _width / 1.1,
-                          height: _height / 13,
-                          margin: EdgeInsets.only(top: 30),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(color: Colors.grey[200]),
-                          child: TextFormField(
-                            style: TextStyle(fontSize: 20),
-                            textAlign: TextAlign.center,
-                            enabled: false,
-                            keyboardType: TextInputType.text,
-                            controller: _starttimeController,
-                            decoration: InputDecoration(
-                                hintText: 'Select Event Start Time',
-                                disabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide.none),
-                                contentPadding: EdgeInsets.only(top: 0.0)),
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+                          decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
+                          child: Row(
+                            children: [
+                              Text(_startDateText ?? "Select Date Range", style: TextStyle(fontSize: 16, color: FlutterFlowTheme.of(context).cardTextColor, fontWeight: FontWeight.w600),),
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 20),
+                                width: 2,
+                                height: 35,
+                                color: FlutterFlowTheme.of(context).cardTextColor,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(_startTimeText ?? "Select Start Time", style: TextStyle(fontSize: 16, color: FlutterFlowTheme.of(context).cardTextColor, fontWeight: FontWeight.w600),),
+                                    Icon(Icons.arrow_drop_down, color: FlutterFlowTheme.of(context).cardTextColor, size: 30,),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      InkWell(
+                      ) : Container(),
+                      const SizedBox(height: 20),
+                      _selectedDateRange != null ? InkWell(
                         onTap: () {
                           _selectendTime(context);
                         },
-                        child: Container(
-                          width: _width / 1.1,
-                          height: _height / 13,
-                          margin: EdgeInsets.only(top: 30),
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(color: Colors.grey[200]),
-                          child: TextFormField(
-                            style: TextStyle(fontSize: 20),
-                            textAlign: TextAlign.center,
-                            enabled: false,
-                            keyboardType: TextInputType.text,
-                            controller: _endtimeController,
-                            decoration: InputDecoration(
-                                hintText: 'Select Event End Time',
-                                disabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide.none),
-                                contentPadding: EdgeInsets.only(top: 0.0)),
+                        child: Ink(
+                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                          decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8),),
+                          child: Row(
+                            children: [
+                              Text(_endDateText ?? "Select Date Range", style: TextStyle(fontSize: 16, color: FlutterFlowTheme.of(context).cardTextColor, fontWeight: FontWeight.w600),),
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 20),
+                                width: 2,
+                                height: 35,
+                                color: FlutterFlowTheme.of(context).cardTextColor,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(_endTimeText ?? "Select End Time", style: TextStyle(fontSize: 16, color: FlutterFlowTheme.of(context).cardTextColor, fontWeight: FontWeight.w600),),
+                                    Icon(Icons.arrow_drop_down, color: FlutterFlowTheme.of(context).cardTextColor, size: 30,),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ),
+                      ) : Container(),
                     ],
                   ),
                 ),
@@ -357,50 +353,26 @@ class _CreateEventState extends State<CreateEvent> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(color: Colors.white))
-                      : Text("Start Event"),
+                      : const Text("Start Event"),
                   onPressed: () async {
                     setState(() {
                       _isLoading = true;
                     });
                     try {
-                      List<String> candidate = [];
-                      selectCandidateList.forEach((element) {
-                        candidate.add(element.name!);
-                      });
-                      final uid = FirebaseAuth.instance.currentUser!.uid;
-                      final docRef = Company.collection.doc();
-                      ElectionEvent electionEvent = ElectionEvent(
-                          evid: docRef.id,
-                          topic: _nameController.text,
-                          description: _descriptionController.text,
-                          endTimestamp: _setendtime,
-                          creationTimestamp: Timestamp.now(),
-                          startTimestamp: _setstarttime,
-                          cid: widget.companydata.cid,
-                          voters: [],
-                          candidates: candidate,
-                          companyData: CompanySummary(
-                            cid: widget.companydata.cid,
-                            cin: widget.companydata.cin,
-                            name: widget.companydata.name,
-                            admin: widget.companydata.admin,
-                          ));
+
                       await FirestoreFunctions().createElectionEvent(
                         topic: _nameController.text,
                         description: _descriptionController.text,
-                        endTimestamp: _setendtime,
-                        startTimestamp: _setstarttime,
-                        cid: widget.companydata.cid,
+                        endTimestamp: Timestamp.fromDate(DateTime(_selectedDateRange!.end.year, _selectedDateRange!.end.month, _selectedDateRange!.end.day, _selectedEndTimeOfDay!.hour, _selectedEndTimeOfDay!.minute)),
+                        startTimestamp: Timestamp.fromDate(DateTime(_selectedDateRange!.start.year, _selectedDateRange!.start.month, _selectedDateRange!.start.day, _selectedStartTimeOfDay!.hour, _selectedStartTimeOfDay!.minute)),
+                        cid: widget.company.cid,
                         voters: [],
-                        candidates: candidate,
+                        candidates: selectCandidateList.map((e) => e.uid).toList(),
                       );
-                      // await FirestoreFunctions().createPollEvent(poll);
-
-                      // await FirestoreFunctions().createPollEvent(poll);
                       setState(() {
                         _isLoading = false;
                       });
-                      Get.snackbar("Success", "Event Created");
+                      print('create_event: success');
                       Get.back();
                     } catch (e) {
                       print(e.toString());
@@ -424,7 +396,8 @@ class _CreateEventState extends State<CreateEvent> {
 List<Candidate> candidateList = [];
 
 class Candidate {
-  final String? name;
+  final String uid;
+  final String name;
   final String? avatar;
-  Candidate({this.name, this.avatar});
+  Candidate({required this.uid, required this.name, this.avatar});
 }

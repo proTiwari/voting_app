@@ -55,7 +55,7 @@ class _CompanyDetailsState extends State<CompanyDetails> {
         ),
         body: TabBarView(
           children: <Widget>[
-            CompanyEvents(cid: widget.company.cid, companydata: widget.company,),
+            CompanyEvents(company: widget.company,),
             CompanyMembers(company: widget.company),
           ],
         ),
