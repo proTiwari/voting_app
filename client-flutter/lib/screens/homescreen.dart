@@ -28,6 +28,13 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     initFunction();
     deeplink();
+    getActiveEvents();
+  }
+
+  List activeEvents = [];
+
+  getActiveEvents ()async{
+    activeEvents = await FirestoreFunctions().getActiveEvents();
   }
 
   String? referLink = '';
@@ -69,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
         walletAddress;
       });
       AppState().address = walletAddress;
-      print("iwoeifjwoeijf");
+      print("iwoeifjwoeijf 1");
 
       // get balance
       EtherAmount am = await contractService.getBalance();
@@ -128,11 +135,11 @@ class _HomeScreenState extends State<HomeScreen> {
           body: Padding(
             padding: const EdgeInsets.only(top: 10.0),
             child: Column(children: [
-              Align(
-                alignment: AlignmentDirectional(-0.05, -0.8),
+              Expanded(
+                flex: 5,
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.93,
-                  height: 190,
+
                   decoration: BoxDecoration(
                     color: Color.fromARGB(220, 59, 58, 58),
                     borderRadius: BorderRadius.circular(25),
@@ -187,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     obscureText: false,
                                     decoration: InputDecoration(
                                       hintText:
-                                          'address:\n${AppState().address}',
+                                          'Address:\n${AppState().address}',
                                       hintStyle: FlutterFlowTheme.of(context)
                                           .bodyText2
                                           .override(
@@ -245,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ClipboardData(text: AppState().address));
                                 },
                                 child: Align(
-                                  alignment: AlignmentDirectional(0.9, 0),
+                                  alignment: AlignmentDirectional(0.9, -0.4),
                                   child: Padding(
                                     padding: EdgeInsetsDirectional.fromSTEB(
                                         0, 0, 0, 0),
@@ -266,89 +273,67 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              SizedBox(
-                height: 40,
-              ),
-              Align(
-                alignment: AlignmentDirectional(-0.85, 0),
-                child: Text(
-                  'Events',
-                  style: FlutterFlowTheme.of(context).bodyText1.override(
-                        fontFamily: 'Urbanist',
-                        color: FlutterFlowTheme.of(context).darkBGstatic,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+              //expanded
+              // SizedBox(
+              //   height: 40,
+              // ),
+              Expanded(
+                flex:1,
+                child: Align(
+                  alignment: AlignmentDirectional(-0.85, 0),
+                  child: Text(
+                    'Events',
+                    style: FlutterFlowTheme.of(context).bodyText1.override(
+                      fontFamily: 'Urbanist',
+                      color: FlutterFlowTheme.of(context).darkBGstatic,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-              Container(
-                  height: 360,
-                  child: ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    scrollDirection: Axis.vertical,
-                    itemCount: 5,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Align(
-                        alignment: AlignmentDirectional(-0.05, -0.8),
-                        child: Padding(
-                          padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                          child: Container(
-                            width: MediaQuery.of(context).size.width * 0.91,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(220, 59, 58, 58),
-                              borderRadius: BorderRadius.circular(18),
+              Expanded(
+                flex:5,
+                child: Container(
+                    height: 360,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: activeEvents.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Align(
+                          alignment: AlignmentDirectional(-0.05, -0.8),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.91,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Color.fromARGB(220, 59, 58, 58),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text("${activeEvents[index].topic}", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                                  ),
+                                  Text("${activeEvents[index].description}"),
+                                  Container()
+                                ],
+                              )
                             ),
                           ),
-                        ),
-                      );
-                    },
-                  ))
+                        );
+                      },
+                    )),
+              ),
+
+
             ]),
           ),
-          floatingActionButton: GestureDetector(
-            onTap: () async {
-              print("sdfwe");
-              if (referLink != '') {
-                print("sdfwe1");
-                await share();
-              }
-              print("sdfwe2");
-            },
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(1.0, 1, 41, 44),
-              child: IconButton(
-                icon: Stack(
-                  children: [
-                    const Icon(
-                      Icons.circle,
-                      color: Color.fromARGB(220, 255, 255, 255),
-                      size: 80,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(25.0),
-                      child: Center(
-                        child: const Icon(
-                          Icons.add,
-                          color: Color.fromARGB(220, 0, 0, 0),
-                          size: 30,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                onPressed: () async {
-                  print("sdfwe");
-                  if (referLink != '') {
-                    print("sdfwe1");
-                    await share();
-                  }
-                  print("sdfwe2");
-                },
-              ),
-            ),
-          ),
+
         ),
       ),
     );

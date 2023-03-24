@@ -34,8 +34,8 @@ class Company {
       creationTimestamp: data['creationTimestamp'] ?? Timestamp.now(),
       name: data['name'] ?? '',
       admin: data['admin'] ?? '',
-      users: data['users'] ?? [],
-      events: data['events'] ?? [],
+      users: (data['users'] as List?)?.map((i) => i as String).toList() ?? [],
+      events: (data['events'] as List?)?.map((i) => i as String).toList() ?? [],
     );
   }
 

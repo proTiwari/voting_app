@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
+import '../objects/ElectionEvent.dart';
+import '../objects/PollEvent.dart';
 import '../services/firestore_functions.dart';
 
 class CompanyEvents extends StatefulWidget {
@@ -19,7 +22,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
     getAllCompanyEvents();
   }
 
-  var events = [];
+  List<dynamic> events = [];
 
   getAllCompanyEvents() async {
     events = await FirestoreFunctions().getAllCompanyEvents(widget.cid!);
@@ -37,7 +40,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
             Align(
               alignment: AlignmentDirectional(-0.85, 0),
               child: Text(
-                'Companies',
+                'Events',
                 style: FlutterFlowTheme.of(context).bodyText1.override(
                       fontFamily: 'Urbanist',
                       color: FlutterFlowTheme.of(context).darkBGstatic,
@@ -54,17 +57,57 @@ class _CompanyEventsState extends State<CompanyEvents> {
                 scrollDirection: Axis.vertical,
                 itemCount: events.length,
                 itemBuilder: (BuildContext context, int index) {
-                  return Align(
-                    alignment: AlignmentDirectional(-0.05, -0.8),
+                  var type = events[index].runtimeType;
+                  String topic = "";
+                  String description = "";
+                  String timeStr = "";
+                  if(type == ElectionEvent) {
+                    final event = events[index] as ElectionEvent;
+                    topic = event.topic;
+                    description = event.description;
+                  }
+                  else if (type == PollEvent) {
+                    final event = events[index] as PollEvent;
+                    topic = event.topic;
+                    description = event.description;
+                  }
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    margin: const EdgeInsets.all(10),
+                    elevation: 0,
+                    color: FlutterFlowTheme.of(context).cardBackgroundColor,
                     child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(0, 10, 0, 0),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(220, 59, 58, 58),
-                          borderRadius: BorderRadius.circular(18),
-                        ),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.business,
+                            color: FlutterFlowTheme.of(context).primaryColor,
+                            size: 24,
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${topic}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 20 ) ),
+                                  SizedBox(height: 4),
+                                  Text('${description}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 12 ) ),
+                                  SizedBox(height: 6),
+                                  Text('${timeStr}',style: TextStyle(color: FlutterFlowTheme.of(context).cardTextColor, fontSize: 8 ) ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.navigate_next), onPressed: () {
+                            Get.to(CompanyEvents(cid:"cid"));
+                          },)
+                        ],
                       ),
                     ),
                   );
@@ -72,6 +115,18 @@ class _CompanyEventsState extends State<CompanyEvents> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // create event
+
+        },
+        backgroundColor: FlutterFlowTheme.of(context).cardTextColor,
+        child: Icon(
+          Icons.add,
+          color: FlutterFlowTheme.of(context).white,
+          size: 24,
         ),
       ),
     );

@@ -18,13 +18,9 @@ class CustomBottomNavigation extends StatefulWidget {
 }
 
 class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
-  late int pageIndex = 0;
+  late int currentPageIndex = 0;
 
-  final pages = [
-    HomeScreen(),
-    Companies(),
-    Me()
-  ];
+  final pages = [HomeScreen(), Companies(), Me()];
 
   @override
   void initState() {
@@ -34,104 +30,31 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 0,
-          leading: null,
-          backgroundColor:Color.fromARGB(220, 59, 58, 58),
-        ),
-        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
-        body: pages[pageIndex],
-        bottomNavigationBar: Container(
-          margin: EdgeInsets.symmetric(
-              vertical: 0, horizontal: width < 800 ? 8 : width * 0.24),
-          height: 70,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Container(
-                width: 80,
-                height: 60,
-                child: IconButton(
-                  enableFeedback: false,
-                  onPressed: () {
-                    setState(() {
-                      pageIndex = 0;
-                    });
-                  },
-                  icon: Column(
-                    children: [
-                      Image.asset(
-                        "assets/home.png",color: Color.fromARGB(220, 59, 58, 58),
-                        height: 30,
-                      ),
-                      Text(
-                        "Home",
-                        style: GoogleFonts.poppins(
-                            fontSize: 9),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 80,
-                height: 60,
-                child: IconButton(
-                  enableFeedback: false,
-                  onPressed: () {
-                    setState(() {
-                      pageIndex = 1;
-                    });
-                  },
-                  icon: Column(
-                    children: [
-                      Image.asset(
-                        "assets/group.png",color: Color.fromARGB(220, 59, 58, 58),
-                        height: 30,
-                      ),
-                      Text(
-                        "Companies",
-                        style: GoogleFonts.poppins(
-                            fontSize: 9),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Container(
-                width: 80,
-                height: 60,
-                child: IconButton(
-                  enableFeedback: false,
-                  onPressed: () {
-                    setState(() {
-                      pageIndex = 2;
-                    });
-                  },
-                  icon: Column(
-                    children: [
-                      Image.asset(
-                        "assets/user.png",color: Color.fromARGB(220, 59, 58, 58),
-                        height: 30,
-                      ),
-                      Text(
-                        "Me",
-                        style: GoogleFonts.poppins(
-                            fontSize: 9),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            ],
+    return Scaffold(
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(
+            icon: Icon(Icons.home),
+            label: 'Home',
           ),
-        ),
+          NavigationDestination(
+            icon: Icon(Icons.diversity_3),
+            label: 'Companies',
+          ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.person),
+            icon: Icon(Icons.bookmark_border),
+            label: 'Me',
+          ),
+        ],
       ),
+      body: <Widget>[HomeScreen(), const Companies(), const Me()][currentPageIndex],
     );
   }
 }

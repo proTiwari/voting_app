@@ -26,7 +26,9 @@ class ContractService {
   }
 
   getBalance() async {
+    print("getBalance");
     EthPrivateKey? wallet = await getOrGenerateWallet();
+    print("getBalance: wallet ${wallet}");
     return Web3Client(Constants.RPC_URL, Client()).getBalance(wallet!.address);
   }
 

@@ -12,7 +12,7 @@ import 'services/app_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+  //await dotenv.load(fileName: ".env");
   final appState = AppState();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
