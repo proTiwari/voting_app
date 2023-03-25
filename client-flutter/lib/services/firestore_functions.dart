@@ -11,6 +11,9 @@ import '../objects/ElectionEvent.dart';
 import '../objects/EmployeeSummary.dart';
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 
+import 'code_generator.dart';
+import 'deeplink_service.dart';
+
 class FirestoreFunctions {
   String? uid = FirebaseAuth.instance.currentUser?.uid;
   var firestore = FirebaseFirestore.instance;
@@ -253,6 +256,11 @@ class FirestoreFunctions {
       }
     });
 
+    final referCode =
+        await CodeGenerator().generateCode('refer', invitation.inviteId);
+
+    final inviteLink = await DeepLinkService.instance?.createReferLink(referCode, "");
+
     // send email with sendgrid_mailer library
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
@@ -260,7 +268,7 @@ class FirestoreFunctions {
     final content = Content(
         'text/plain',
         'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
-            'https://evotingapp.page.link/invite-member/${invitation.inviteId}');
+            '$inviteLink');
     final subject =
         'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);
@@ -324,9 +332,7 @@ class FirestoreFunctions {
 
   // getInvite function to get an invite from the collection invites where the invite id is equal to the given invite id
   Future<Invite?> getInvite(String inviteId) async {
-    print('getInvite: $inviteId');
     var snapshot = await Invite.collection.doc(inviteId).get();
-    print('getInvite: $snapshot ${snapshot.data()}');
     return snapshot.data();
   }
 
@@ -338,6 +344,10 @@ class FirestoreFunctions {
 
   Future<List<EmployeeSummary>> getElectionEventCandidatesData(ElectionEvent event) async {
     var snapshot = await Company.collection.doc(event.cid).get();
-    return snapshot.data()!.empData.values.where((element) => event.candidates.contains(element.uid)).toList();
+    List<EmployeeSummary> candidates = [];
+    for (var candidate in event.candidates) {
+      candidates.add(snapshot.data()!.empData[candidate]!);
+    }
+    return candidates;
   }
 }

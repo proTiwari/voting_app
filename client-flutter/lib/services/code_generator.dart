@@ -7,13 +7,7 @@ class CodeGenerator {
   Random random = Random();
   final FirebaseAuth auth = FirebaseAuth.instance;
 
-  Future<String> generateCode(String prefix, property) async {
-    return '$prefix-${property}';
-  }
-
-  Future<String> generateCodeformoneyreward(String prefix) async {
-    var id = await auth.currentUser!.uid.toString();
-
-    return '$prefix-${id.toString()}';
+  Future<String> generateCode(String prefix, link) async {
+    return '$prefix-${link}';
   }
 }

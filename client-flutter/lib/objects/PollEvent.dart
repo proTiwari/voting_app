@@ -71,4 +71,16 @@ class PollEvent {
       fromFirestore: PollEvent.fromFirestore,
       toFirestore: (PollEvent event, _) => event.toFirestore()
   );
+
+  EventStatus computeEventStatus() {
+    if (endTimestamp.toDate().isBefore(DateTime.now())) {
+      return EventStatus.expired;
+    } else if (startTimestamp.toDate().isAfter(DateTime.now())) {
+      return EventStatus.coming;
+    } else {
+      return EventStatus.active;
+    }
+  }
 }
+
+enum EventStatus { coming, active, expired }

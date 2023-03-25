@@ -2,11 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/screens/company_details.dart';
-import 'package:voting_app/screens/events.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/Company.dart';
-import '../objects/EmployeeSummary.dart';
 import '../services/firestore_functions.dart';
 import '../widgets/company_card.dart';
 import '../widgets/create_company.dart';

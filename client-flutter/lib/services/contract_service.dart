@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math'; //used for the random number generator
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web3dart/web3dart.dart';
@@ -13,11 +14,14 @@ class ContractService {
   late final EthereumAddress _contractAddress;
   late final String _abiCode;
 
+  final String RPC_URL = 'https://sepolia.infura.io/v3/${dotenv.env['INFURA_SEPOLIA_API_KEY']!}';
+  final String WS_URL = "wss://sepolia.infura.io/ws/v3/${dotenv.env['INFURA_SEPOLIA_API_KEY']!}";
+
   ContractService._();
 
   Future<void> getAbi() async {
-    _web3client = Web3Client(Constants.RPC_URL, Client(), socketConnector: () {
-      return IOWebSocketChannel.connect(Constants.WS_URL).cast<String>();
+    _web3client = Web3Client(RPC_URL, Client(), socketConnector: () {
+      return IOWebSocketChannel.connect(WS_URL).cast<String>();
     });
     String abiFile = await rootBundle.loadString('assets/CorporateVoting.json');
     final abiJSON = jsonDecode(abiFile);
@@ -68,7 +72,7 @@ class ContractService {
   }
 
   // vote in contract
-  Future<String> vote(String eventId, String uid, String optionNum) async {
+  Future<String> vote(String eventId, String uid, int optionNum) async {
     EthPrivateKey? wallet = await getOrGenerateWallet();
     DeployedContract contract = DeployedContract(
         ContractAbi.fromJson(_abiCode, "CorporateVoting"), _contractAddress);
@@ -76,8 +80,10 @@ class ContractService {
     final result = await _web3client.sendTransaction(
         wallet!,
         Transaction.callContract(
-            contract: contract, function: vote, parameters: [eventId, uid, optionNum]),
-        fetchChainIdFromNetworkId: true);
+            contract: contract,
+            function: vote,
+            parameters: [eventId, uid, BigInt.from(optionNum)]),
+            chainId: 11155111);
     return result;
   }
 

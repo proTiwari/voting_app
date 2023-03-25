@@ -23,15 +23,17 @@ class EventCard extends StatelessWidget {
           var type = activeEvents[index].runtimeType;
           String topic = "";
           String description = "";
-          String timeStr = "";
+          bool isActive = true;
           if (type == ElectionEvent) {
             final event = activeEvents[index] as ElectionEvent;
             topic = event.topic;
             description = event.description;
+            isActive = event.computeEventStatus() == EventStatus.active;
           } else if (type == PollEvent) {
             final event = activeEvents[index] as PollEvent;
             topic = event.topic;
             description = event.description;
+            isActive = event.computeEventStatus() == EventStatus.active;
           }
           return GestureDetector(
             onTap: () async {
@@ -60,6 +62,29 @@ class EventCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            isActive ? Container(
+                              width: 70,
+                              height: 30,
+                              decoration: BoxDecoration(
+                                color: FlutterFlowTheme.of(context).greenColor,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'Active',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyText1
+                                      .override(
+                                    fontFamily: 'Urbanist',
+                                    color: Colors.white,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            )
+                                : Container(),
+                            SizedBox(height: 6),
                             Text('${topic}',
                                 style: TextStyle(
                                     color: FlutterFlowTheme.of(context)
@@ -72,11 +97,7 @@ class EventCard extends StatelessWidget {
                                         .cardTextColor,
                                     fontSize: 12)),
                             SizedBox(height: 6),
-                            Text('${timeStr}',
-                                style: TextStyle(
-                                    color: FlutterFlowTheme.of(context)
-                                        .cardTextColor,
-                                    fontSize: 8)),
+
                           ],
                         ),
                       ),

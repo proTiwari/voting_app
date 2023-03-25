@@ -4,6 +4,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'CompanySummary.dart';
+import 'PollEvent.dart';
 
 class ElectionEvent {
   final String evid;
@@ -17,6 +18,8 @@ class ElectionEvent {
   final Timestamp endTimestamp;
   final CompanySummary companyData;
   final String type = 'election';
+  final String? transactionHash;
+  final Timestamp? voteTimestamp;
 
   ElectionEvent({
     required this.evid,
@@ -29,6 +32,8 @@ class ElectionEvent {
     required this.startTimestamp,
     required this.endTimestamp,
     required this.companyData,
+    this.transactionHash,
+    this.voteTimestamp,
   });
 
   factory ElectionEvent.fromFirestore(
@@ -46,6 +51,8 @@ class ElectionEvent {
       startTimestamp: data['startTimestamp'] ?? Timestamp.now(),
       endTimestamp: data['endTimestamp'] ?? Timestamp.now(),
       companyData: CompanySummary.fromMap(data['companyData']),
+      transactionHash: data['transactionHash'] ?? '',
+      voteTimestamp: data['voteTimestamp'],
     );
   }
 
@@ -63,6 +70,8 @@ class ElectionEvent {
       'endTimestamp': endTimestamp,
       'type': type,
       'companyData': companyData.toFirestore(),
+      'transactionHash': transactionHash,
+      'voteTimestamp': voteTimestamp,
     };
   }
 
@@ -70,4 +79,14 @@ class ElectionEvent {
       FirebaseFirestore.instance.collection('events').withConverter(
           fromFirestore: ElectionEvent.fromFirestore,
           toFirestore: (ElectionEvent event, _) => event.toFirestore());
+
+  EventStatus computeEventStatus() {
+    if (endTimestamp.toDate().isBefore(DateTime.now())) {
+      return EventStatus.expired;
+    } else if (startTimestamp.toDate().isAfter(DateTime.now())) {
+      return EventStatus.coming;
+    } else {
+      return EventStatus.active;
+    }
+  }
 }
