@@ -9,6 +9,9 @@ import '../objects/ElectionEvent.dart';
 import '../objects/EmployeeSummary.dart';
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
 
+import 'code_generator.dart';
+import 'deeplink_service.dart';
+
 class FirestoreFunctions {
   String? uid = FirebaseAuth.instance.currentUser?.uid;
   var firestore = FirebaseFirestore.instance;
@@ -251,6 +254,11 @@ class FirestoreFunctions {
       }
     });
 
+    final referCode =
+        await CodeGenerator().generateCode('refer', invitation.inviteId);
+
+    final inviteLink = await DeepLinkService.instance?.createReferLink(referCode, "");
+
     // send email with sendgrid_mailer library
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
@@ -258,7 +266,7 @@ class FirestoreFunctions {
     final content = Content(
         'text/plain',
         'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
-            'https://evotingapp.page.link/invite-member/${invitation.inviteId}');
+            '$inviteLink');
     final subject =
         'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);

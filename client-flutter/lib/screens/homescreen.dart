@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/globals.dart';
+import 'package:voting_app/screens/invitation_action_screen.dart';
 import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
@@ -33,6 +35,15 @@ class _HomeScreenState extends State<HomeScreen> {
     initFunction();
     deeplink();
     refresh();
+  }
+
+  getdynamiclink() async {
+    if (dynamiclink != '') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => InvitationActionScreen('kklk')),
+      );
+    }
   }
 
   List activeEvents = [];
@@ -142,96 +153,99 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child:
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              
-                GestureDetector(
-                  onTap: () async {
-                    Get.snackbar('Copied!', 'address is copied to clipboard!');
-                    await Clipboard.setData(
-                        ClipboardData(text: AppState().address));
-                  },
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                    color: FlutterFlowTheme.of(context).cardBackgroundColor,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Expanded(
-                        flex: 1,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: () async {
+                        Get.snackbar(
+                            'Copied!', 'address is copied to clipboard!');
+                        await Clipboard.setData(
+                            ClipboardData(text: AppState().address));
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                        color: FlutterFlowTheme.of(context).cardBackgroundColor,
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          padding: const EdgeInsets.all(16.0),
+                          child: Expanded(
+                            flex: 1,
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Ethereum Wallet',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyText1
+                                            .override(
+                                              fontFamily: 'Urbanist',
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .cardTextColor,
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                      ),
+                                      Icon(Icons.copy),
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
                                   Text(
-                                    'Ethereum Wallet',
+                                    AppState().address,
                                     style: FlutterFlowTheme.of(context)
                                         .bodyText1
                                         .override(
                                           fontFamily: 'Urbanist',
                                           color: FlutterFlowTheme.of(context)
                                               .cardTextColor,
-                                          fontSize: 25,
+                                          fontSize: 20,
                                           fontWeight: FontWeight.w600,
                                         ),
                                   ),
-                                  Icon(Icons.copy),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    '$balance  ETH',
+                                    style: FlutterFlowTheme.of(context)
+                                        .bodyText1
+                                        .override(
+                                          fontFamily: 'Urbanist',
+                                          color: FlutterFlowTheme.of(context)
+                                              .cardTextColor,
+                                          fontSize: 34,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
                                 ],
                               ),
-                              SizedBox(height: 10),
-                              Text(
-                                AppState().address,
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyText1
-                                    .override(
-                                      fontFamily: 'Urbanist',
-                                      color: FlutterFlowTheme.of(context)
-                                          .cardTextColor,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                              SizedBox(height: 6),
-                              Text(
-                                '$balance  ETH',
-                                style: FlutterFlowTheme.of(context)
-                                    .bodyText1
-                                    .override(
-                                      fontFamily: 'Urbanist',
-                                      color: FlutterFlowTheme.of(context)
-                                          .cardTextColor,
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Events',
-                  style: FlutterFlowTheme.of(context).bodyText1.override(
-                        fontFamily: 'Urbanist',
-                        color: FlutterFlowTheme.of(context).darkBGstatic,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                //event card
-                EventCard(
-                  activeEvents: activeEvents,
-                ),
-              ]),
+                    SizedBox(height: 20),
+                    Text(
+                      'Events',
+                      style: FlutterFlowTheme.of(context).bodyText1.override(
+                            fontFamily: 'Urbanist',
+                            color: FlutterFlowTheme.of(context).darkBGstatic,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    //event card
+                    EventCard(
+                      activeEvents: activeEvents,
+                    ),
+                  ]),
             ),
           ),
         ),
