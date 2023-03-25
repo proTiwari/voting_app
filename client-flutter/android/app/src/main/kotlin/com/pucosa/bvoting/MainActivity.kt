@@ -1,4 +1,4 @@
-package com.example.voting_app
+package com.pucosa.bvoting
 
 import io.flutter.embedding.android.FlutterActivity
 

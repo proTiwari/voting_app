@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.voting_app">
+    package="com.pucosa.bvoting">
    <application
         android:label="voting_app"
         android:name="${applicationName}"
