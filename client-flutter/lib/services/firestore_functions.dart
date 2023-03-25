@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -332,5 +334,10 @@ class FirestoreFunctions {
   Future<List<EmployeeSummary>> getCompanyMembers(String cid) async {
     var snapshot = await Company.collection.doc(cid).get();
     return snapshot.data()!.empData.values.toList();
+  }
+
+  Future<List<EmployeeSummary>> getElectionEventCandidatesData(ElectionEvent event) async {
+    var snapshot = await Company.collection.doc(event.cid).get();
+    return snapshot.data()!.empData.values.where((element) => event.candidates.contains(element.uid)).toList();
   }
 }

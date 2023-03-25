@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Events',
+                  'Active Events',
                   style: FlutterFlowTheme.of(context).bodyText1.override(
                         fontFamily: 'Urbanist',
                         color: FlutterFlowTheme.of(context).darkBGstatic,

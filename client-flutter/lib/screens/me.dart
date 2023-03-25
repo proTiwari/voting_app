@@ -22,7 +22,6 @@ class _MeState extends State<Me> {
                 .doc(FirebaseAuth.instance.currentUser!.uid)
                 .snapshots(),
             builder: (context, snapshot) {
-              print("ttttttttttttt   ${snapshot.data!.data()!['name']}");
               return ListView.builder(
                 physics: const BouncingScrollPhysics(),
                 itemBuilder: (BuildContext context, int index) {
