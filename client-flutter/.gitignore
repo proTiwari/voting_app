@@ -23,6 +23,10 @@ migrate_working_dir/
 
 # Flutter/Dart/Pub related
 .keys.dart
+.jks
+.keystore
+*.jks
+*.keystore
 .env
 .env.test
 **/doc/api/

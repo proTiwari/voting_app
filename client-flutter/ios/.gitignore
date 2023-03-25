@@ -10,6 +10,8 @@
 **/.vagrant/
 **/DerivedData/
 Icon?
+**.jks
+**.keystore
 **/Pods/
 **/.symlinks/
 profile

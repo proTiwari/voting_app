@@ -33,6 +33,43 @@
           ]
         }
       }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:657952523892:android:4a2c830ac03dbe667ff321",
+        "android_client_info": {
+          "package_name": "com.pucosa.bvoting"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "657952523892-escde8an01djs1l6cg4v1c819o0u0512.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pucosa.bvoting",
+            "certificate_hash": "5ce1d05d95cdd4dcfdc33467ff87136b48febd63"
+          }
+        },
+        {
+          "client_id": "657952523892-5s4mdf2nh7i20vga2b63vci1l3cd5mm8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDji01ocOiCPoZoX1_VQzH0jv7YTvicn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "657952523892-5s4mdf2nh7i20vga2b63vci1l3cd5mm8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
     }
   ],
   "configuration_version": "1"
