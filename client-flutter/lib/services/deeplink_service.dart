@@ -4,7 +4,6 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:voting_app/globals.dart';
 
-
 class DeepLinkService {
   DeepLinkService._();
   static DeepLinkService? _instance;
@@ -17,9 +16,10 @@ class DeepLinkService {
   ValueNotifier<String> referrerCode = ValueNotifier<String>('');
   ValueNotifier<String> moneyreferrerCode = ValueNotifier<String>('');
 
-  final dynamicLink = FirebaseDynamicLinks.instance;
 
-  Future<void> handleDynamicLinks() async {
+  var dynamicLink = FirebaseDynamicLinks.instance;
+
+  handleDynamicLinks() async {
     //Get initial dynamic link if app is started using the link
     final data = await dynamicLink.getInitialLink();
     print("sdfffffffffffffffasdjfaaaaaaaaaaaaaaaaaaaaaaaaaaaanull: ${data}");
@@ -27,34 +27,41 @@ class DeepLinkService {
       print("sdfffffffffffffffasdjfaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${data.link}");
       try {
         dynamiclink = data.link.toString().split("%22")[1].split('refer-')[1];
-      } catch (e) {}
+
+        print("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuu: {dynamicLink}");
+      } catch (e) {
+        return null;
+      }
 
       _handleDeepLink(data);
     }
 
     //handle foreground
-    dynamicLink.onLink.listen((event) {
-      _handleDeepLink(event);
-    }).onError((v) {
-      debugPrint('Failed: $v');
-    });
+    // data.onLink.listen((event) {
+    //   var result = _handleDeepLink(event);
+    //   return result;
+    // }).onError((v) {
+    //   debugPrint('Failed: $v');
+    //   return null;
+    // });
   }
 
   Future<String> createReferLink(String referCode, property) async {
     DynamicLinkParameters dynamicLinkParameters = DynamicLinkParameters(
       uriPrefix: 'https://evotingapp.page.link',
       link: Uri.parse(
-          'https://play.google.com/store/apps/details?id=com.example.voting_app&/refer?code="$referCode"'),
+          'https://play.google.com/store/apps/details?id=com.pucosa.bvoting&/refer?code="$referCode"'),
       androidParameters: AndroidParameters(
         fallbackUrl: Uri.parse(
-            'https://play.google.com/store/apps/details?id=com.example.voting_app'),
-        packageName: 'com.example.voting_app',
+            'https://play.google.com/store/apps/details?id=com.pucosa.bvoting&/refer?code="$referCode"'),
+        packageName: 'com.pucosa.bvoting',
         minimumVersion: 4,
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
         title: 'Join Out Voting Event Now',
         description: '',
-        imageUrl: Uri.parse('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3VQEM57ArMza1oYaCqDoz4ZA1xOyeQF234w&usqp=CAU'),
+        imageUrl: Uri.parse(
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3VQEM57ArMza1oYaCqDoz4ZA1xOyeQF234w&usqp=CAU'),
       ),
     );
 
@@ -63,7 +70,8 @@ class DeepLinkService {
     return shortLink.shortUrl.toString();
   }
 
-  Future<void> _handleDeepLink(PendingDynamicLinkData data) async {
-    final Uri deepLink = data.link;
+  _handleDeepLink(PendingDynamicLinkData data) async {
+    dynamicLink = data.link as FirebaseDynamicLinks;
+    return dynamicLink;
   }
 }

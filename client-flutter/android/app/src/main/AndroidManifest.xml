@@ -1,5 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pucosa.bvoting">
+        <queries>
+    <intent>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data android:scheme="https"
+        android:host="evotingapp.page.link" />
+    </intent>
+</queries>
    <application
         android:label="voting_app"
         android:name="${applicationName}"

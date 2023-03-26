@@ -236,6 +236,10 @@ class FirestoreFunctions {
     String? address = await ContractService.getAddress();
     if (address == null) throw Exception('Address is null');
     final docRef = Invite.collection.doc();
+    var referCode = await CodeGenerator().generateCode('refer', docRef.id);
+
+    var inviteLink =
+    await DeepLinkService.instance?.createReferLink(referCode, "");
 
     // run transaction and get company data
     final invitation =
@@ -265,10 +269,7 @@ class FirestoreFunctions {
       }
     });
 
-    final referCode =
-        await CodeGenerator().generateCode('refer', invitation.inviteId);
-
-    final inviteLink = await DeepLinkService.instance?.createReferLink(referCode, "");
+    print("invitelink: ee ${inviteLink}");
 
     // send email with sendgrid_mailer library
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
@@ -354,7 +355,8 @@ class FirestoreFunctions {
     return snapshot.data()!.empData.values.toList();
   }
 
-  Future<List<EmployeeSummary>> getElectionEventCandidatesData(ElectionEvent event) async {
+  Future<List<EmployeeSummary>> getElectionEventCandidatesData(
+      ElectionEvent event) async {
     var snapshot = await Company.collection.doc(event.cid).get();
     List<EmployeeSummary> candidates = [];
     for (var candidate in event.candidates) {

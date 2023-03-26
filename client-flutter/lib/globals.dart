@@ -1,1 +1,1 @@
-var dynamiclink;
+var dynamiclink = '';
