@@ -27,6 +27,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isLoading = false;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -59,8 +61,22 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> refresh() async {
-    await getActiveEvents();
-    await initFunction();
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      await getActiveEvents();
+      await initFunction();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Something went wrong. Try Again.'),
+        duration: Duration(seconds: 2),
+      ));
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   String? referLink = '';
@@ -91,7 +107,6 @@ class _HomeScreenState extends State<HomeScreen> {
   double balance = 1.0;
   String walletAddress = "";
   initFunction() async {
-    try {
       //get wallet address
       String? address = await ContractService.getAddress();
       walletAddress = address!;
@@ -105,9 +120,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         balance;
       });
-    } catch (e) {
-      print("homescreen_error: ${e.toString()}");
-    }
   }
 
   @override
@@ -157,19 +169,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     GestureDetector(
-                      onTap: () async {
+                      onTap: !_isLoading ? () async {
                         Get.snackbar(
                             'Copied!', 'address is copied to clipboard!');
                         await Clipboard.setData(
                             ClipboardData(text: AppState().address));
-                      },
+                      }: null,
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                         elevation: 0,
                         color: FlutterFlowTheme.of(context).cardBackgroundColor,
-                        child: Padding(
+                        child: _isLoading ? const Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Center(child: CircularProgressIndicator()),
+                        ) : Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Padding(
                             padding: const EdgeInsets.only(left: 16.0),

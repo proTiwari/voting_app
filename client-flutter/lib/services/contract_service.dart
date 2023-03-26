@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:voting_app/services/app_state.dart';
+import 'package:voting_app/utils/extensions.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 import '../constants.keys.dart';
@@ -67,7 +68,8 @@ class ContractService {
 
       if (privateKey == null) {
         EthPrivateKey wallet = _generateWallet();
-        String s = bytesToHex(wallet.privateKey);
+        String s = bytesToHex(wallet.privateKey, include0x: true);
+        print("contract_service: hex: ${s.toString()}; bytes: ${wallet.privateKey.toString()}");
         prefs.setString("privatekey", s);
         AppState().address = wallet.address.hex;
         return wallet;
@@ -80,9 +82,9 @@ class ContractService {
   static Future<EthPrivateKey> setWallet(String privateKey) async {
     var prefs = await SharedPreferences.getInstance();
     EthPrivateKey wallet = _getCredentialsFromPrivateKey(privateKey);
-    String s = bytesToHex(wallet.privateKey);
+    String s = wallet.privateKeyHex;
     prefs.setString("privatekey", s);
-    AppState().address = wallet.address.hex;
+    AppState().address = wallet.addressHex;
     return wallet;
   }
 
