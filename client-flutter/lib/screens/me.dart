@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../widgets/button_widget.dart';
+import 'package:voting_app/services/app_state.dart';
 
 class Me extends StatefulWidget {
+  const Me({super.key});
+
   @override
-  _MeState createState() => _MeState();
+  State<Me> createState() => _MeState();
 }
 
 class _MeState extends State<Me> {
@@ -19,7 +19,7 @@ class _MeState extends State<Me> {
         child: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('users')
-                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .doc(AppState().address)
                 .snapshots(),
             builder: (context, snapshot) {
               return ListView.builder(

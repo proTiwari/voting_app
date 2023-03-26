@@ -1,5 +1,4 @@
 import 'package:date_format/date_format.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:voting_app/objects/BlockchainVotingResult.dart';
 import 'package:voting_app/services/contract_service.dart';
@@ -242,10 +241,10 @@ class _ElectionEventResultsState extends State<ElectionEventResults> {
     _candidates = await loadCandidatesData();
     final eventVotes =
         await BlockchainEventVote.loadFromContract(widget.event.evid);
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
+    final address = await ContractService.getAddress();
+    if (address != null) {
       final userVote = eventVotes.firstWhere(
-          (element) => element.uid == user.uid,
+          (element) => element.uid == address,
           orElse: () => BlockchainEventVote.empty());
       if (!userVote.isEmpty()) {
         _selectedCandidate = _candidates.elementAt(userVote.optionNum - 1);

@@ -1,5 +1,4 @@
 import 'package:date_format/date_format.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/objects/BlockchainEventVote.dart';
@@ -187,9 +186,9 @@ class _ElectionEventVoteActionState extends State<ElectionEventVoteAction> {
     _hasVoted = false;
     _candidates = await loadCandidatesData();
     final eventVotes = await BlockchainEventVote.loadFromContract(widget.event.evid);
-    final user = FirebaseAuth.instance.currentUser;
-    if(user != null) {
-      final userVote = eventVotes.firstWhere((element) => element.uid == user.uid, orElse: () => BlockchainEventVote.empty());
+    final address = await ContractService.getAddress();
+    if(address != null) {
+      final userVote = eventVotes.firstWhere((element) => element.uid == address, orElse: () => BlockchainEventVote.empty());
       if(!userVote.isEmpty()) {
         _selectedCandidate = _candidates.elementAt(userVote.optionNum - 1);
         _hasVoted = true;
@@ -263,7 +262,6 @@ class _ElectionEventVoteActionState extends State<ElectionEventVoteAction> {
       },
     );
 
-    //await FirestoreFunctions().vote(widget.event, _selectedCandidate!);
   }
 
   Future<void> vote() async {
@@ -272,7 +270,8 @@ class _ElectionEventVoteActionState extends State<ElectionEventVoteAction> {
         _isVotingInProgress = true;
       });
       ContractService contractService = await ContractService.build();
-      String transactionHash = await contractService.vote(widget.event.evid, FirebaseAuth.instance.currentUser!.uid, _candidates.indexOf(_selectedCandidate!) + 1);
+      final address = await ContractService.getAddress();
+      String transactionHash = await contractService.vote(widget.event.evid, address!, _candidates.indexOf(_selectedCandidate!) + 1);
       print('transactionHash: $transactionHash');
       await ElectionEvent.collection.doc(widget.event.evid).update({
         'transactionHash': transactionHash,

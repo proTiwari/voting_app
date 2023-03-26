@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/web3dart.dart';
 import 'package:web_socket_channel/io.dart';
 import '../constants.keys.dart';
@@ -29,29 +30,27 @@ class ContractService {
     _contractAddress = EthereumAddress.fromHex(abiJSON['networks']['11155111']['address']);
   }
 
-  getBalance() async {
-    print("getBalance");
-    EthPrivateKey? wallet = await getOrGenerateWallet();
-    print("getBalance: wallet ${wallet}");
+  static getBalance() async {
+    EthPrivateKey? wallet = await getWallet();
     return Web3Client(Constants.RPC_URL, Client()).getBalance(wallet!.address);
   }
 
-  EthPrivateKey _generateWallet() {
+  static EthPrivateKey _generateWallet() {
     var rng = Random.secure();
     EthPrivateKey random = EthPrivateKey.createRandom(rng);
     return random;
   }
 
-  Future<EthPrivateKey?> getOrGenerateWallet() async {
+  // get wallet from shared preferences
+  static Future<EthPrivateKey?> getWallet() async {
     try {
       var prefs = await SharedPreferences.getInstance();
       dynamic privateKey = prefs.getString('privatekey');
 
+      print("contract_service: ${privateKey.toString()}");
+
       if (privateKey == null) {
-        EthPrivateKey wallet = _generateWallet();
-        String s = bytesToHex(wallet.privateKey);
-        prefs.setString("privatekey", s);
-        return wallet;
+        return null;
       } else {
         EthPrivateKey wallet = _getCredentialsFromPrivateKey(privateKey);
         return wallet;
@@ -62,18 +61,43 @@ class ContractService {
     }
   }
 
-  EthPrivateKey _getCredentialsFromPrivateKey(String privateKey) {
+  static Future<EthPrivateKey> getOrGenerateWallet() async {
+      var prefs = await SharedPreferences.getInstance();
+      dynamic privateKey = prefs.getString('privatekey');
+
+      if (privateKey == null) {
+        EthPrivateKey wallet = _generateWallet();
+        String s = bytesToHex(wallet.privateKey);
+        prefs.setString("privatekey", s);
+        AppState().address = wallet.address.hex;
+        return wallet;
+      } else {
+        EthPrivateKey wallet = _getCredentialsFromPrivateKey(privateKey);
+        return wallet;
+      }
+  }
+
+  static Future<EthPrivateKey> setWallet(String privateKey) async {
+    var prefs = await SharedPreferences.getInstance();
+    EthPrivateKey wallet = _getCredentialsFromPrivateKey(privateKey);
+    String s = bytesToHex(wallet.privateKey);
+    prefs.setString("privatekey", s);
+    AppState().address = wallet.address.hex;
+    return wallet;
+  }
+
+  static EthPrivateKey _getCredentialsFromPrivateKey(String privateKey) {
     return EthPrivateKey.fromHex(privateKey);
   }
 
-  Future<String> getAddress() async {
-    EthPrivateKey? wallet = await getOrGenerateWallet();
-    return wallet!.address.hex;
+  static Future<String?> getAddress() async {
+    EthPrivateKey? wallet = await getWallet();
+    return wallet?.address.hex;
   }
 
   // vote in contract
   Future<String> vote(String eventId, String uid, int optionNum) async {
-    EthPrivateKey? wallet = await getOrGenerateWallet();
+    EthPrivateKey? wallet = await getWallet();
     DeployedContract contract = DeployedContract(
         ContractAbi.fromJson(_abiCode, "CorporateVoting"), _contractAddress);
     final vote = contract.function("vote");
@@ -115,10 +139,3 @@ class ContractService {
     return contractService;
   }
 }
-
-
-
-/*
-1. generate wallet which has private key, public key, and address. Save private key securely.
-2. On Home page, have a card for eth balance and public key
-*/

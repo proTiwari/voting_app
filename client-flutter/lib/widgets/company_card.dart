@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/objects/EmployeeSummary.dart';
+import 'package:voting_app/services/app_state.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/Company.dart';
@@ -50,9 +50,7 @@ class CompanyCard extends StatelessWidget {
                             color: FlutterFlowTheme.of(context).cardTextColor,
                             fontSize: 20)),
                     const SizedBox(height: 6),
-                    _companySummary.admin ==
-                            FirebaseAuth.instance.currentUser!.uid
-                        ? Container(
+                    _companySummary.admin == AppState().address ? Container(
                             width: 70,
                             height: 30,
                             decoration: BoxDecoration(

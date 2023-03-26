@@ -1,14 +1,9 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:voting_app/screens/companies.dart';
 import 'package:voting_app/screens/homescreen.dart';
 import 'package:voting_app/screens/me.dart';
-
-import '../flutterflow/flutter_flow_theme.dart';
 
 class CustomBottomNavigation extends StatefulWidget {
   CustomBottomNavigation();

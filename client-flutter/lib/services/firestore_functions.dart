@@ -1,12 +1,12 @@
-import 'dart:math';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:voting_app/objects/AppUser.dart';
 import 'package:voting_app/objects/Company.dart';
 import 'package:voting_app/objects/Invite.dart';
 import 'package:voting_app/objects/PollEvent.dart';
+import 'package:voting_app/services/app_state.dart';
+import 'package:voting_app/services/contract_service.dart';
 import '../objects/ElectionEvent.dart';
 import '../objects/EmployeeSummary.dart';
 import 'package:sendgrid_mailer/sendgrid_mailer.dart';
@@ -15,51 +15,53 @@ import 'code_generator.dart';
 import 'deeplink_service.dart';
 
 class FirestoreFunctions {
-  String? uid = FirebaseAuth.instance.currentUser?.uid;
-  var firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
   // Create a new user in the database
-  Future<void> createUser({
+  Future<AppUser> createUser({
     required String name,
-    required String address,
     required String email,
-    required String uid,
   }) async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     final user = AppUser(
       name: name,
       address: address,
       email: email.trim().toLowerCase(),
-      uid: uid,
+      uid: address,
       creationTimestamp: Timestamp.now(),
       companies: [],
       companyData: {},
     );
     await AppUser.collection.doc(user.uid).set(user);
+    return user;
   }
 
   // Create a new company in the database
   Future<void> createCompany(String cin, String name, String eid) async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     final companyDocRef = Company.collection.doc();
     final company = Company(
       cid: companyDocRef.id,
       cin: cin,
       creationTimestamp: Timestamp.now(),
       name: name,
-      admin: uid!,
-      users: [uid!],
+      admin: address,
+      users: [address],
       events: [],
       empData: {
-        '$uid': EmployeeSummary(
-          uid: uid!,
-          name: FirebaseAuth.instance.currentUser!.displayName!,
-          email: FirebaseAuth.instance.currentUser!.email!,
+        address: EmployeeSummary(
+          uid: address,
+          name: AppState().name,
+          email: AppState().email,
           eid: eid,
         )
       },
     );
-    final batch = firestore.batch();
+    final batch = _firestore.batch();
     batch.set(Company.collection.doc(company.cid), company);
-    batch.update(AppUser.collection.doc(uid), {
+    batch.update(AppUser.collection.doc(address), {
       'companies': FieldValue.arrayUnion([company.cid]),
       'companyData.${company.cid}': company.getCompanySummary().toFirestore(),
     });
@@ -78,7 +80,7 @@ class FirestoreFunctions {
   }) async {
     final eventDocRef = PollEvent.collection.doc();
 
-    await firestore.runTransaction<PollEvent>((transaction) async {
+    await _firestore.runTransaction<PollEvent>((transaction) async {
       final companyDoc = await transaction.get(Company.collection.doc(cid));
       if (companyDoc.exists) {
         final company = companyDoc.data() as Company;
@@ -118,7 +120,7 @@ class FirestoreFunctions {
   }) async {
     final eventDocRef = ElectionEvent.collection.doc();
 
-    await firestore.runTransaction<ElectionEvent>((transaction) async {
+    await _firestore.runTransaction<ElectionEvent>((transaction) async {
       final companyDoc = await transaction.get(Company.collection.doc(cid));
       if (companyDoc.exists) {
         final company = companyDoc.data() as Company;
@@ -148,6 +150,8 @@ class FirestoreFunctions {
 
   // get all active events from the collection events
   Future<List<dynamic>> getActiveEvents() async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     final eventsCollRef = FirebaseFirestore.instance.collection('events');
     List<dynamic> events = [];
     Timestamp now = Timestamp.now();
@@ -158,12 +162,12 @@ class FirestoreFunctions {
     for (var doc in filteredDocs) {
       if (doc.data()['type'] == 'poll') {
         PollEvent event = PollEvent.fromFirestore(doc, null);
-        if (event.voters.contains(uid)) {
+        if (event.voters.contains(address)) {
           events.add(event);
         }
       } else if (doc.data()['type'] == 'election') {
         ElectionEvent event = ElectionEvent.fromFirestore(doc, null);
-        if (event.voters.contains(uid) || event.candidates.contains(uid)) {
+        if (event.voters.contains(address) || event.candidates.contains(address)) {
           events.add(event);
         }
       }
@@ -189,9 +193,11 @@ class FirestoreFunctions {
 
   // get all companies from the collection companies where uid is equal to firebase user uid
   Future<List<Company>> getCompanies() async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     List<Company> companies = [];
     var snapshot =
-        await Company.collection.where('users', arrayContains: uid).get();
+        await Company.collection.where('users', arrayContains: address).get();
     for (var doc in snapshot.docs) {
       companies.add(doc.data());
     }
@@ -219,32 +225,35 @@ class FirestoreFunctions {
 
   // get a user from the collection users where uid is equal to firebase user uid
   Future<AppUser?> getUser() async {
-    var snapshot = await AppUser.collection.doc(uid).get();
+    String? address = await ContractService.getAddress();
+    if(address == null) throw Exception('Address is null');
+    var snapshot = await AppUser.collection.doc(address).get();
     return snapshot.data();
   }
 
   // function to invite a user to a company
   Future<void> inviteUser(String companyEmail, String cid, String eid) async {
-    if (uid == null) return;
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     final docRef = Invite.collection.doc();
 
     // run transaction and get company data
     final invitation =
-        await firestore.runTransaction<Invite>((transaction) async {
+        await _firestore.runTransaction<Invite>((transaction) async {
       final companyDoc = await transaction.get(Company.collection.doc(cid));
       if (companyDoc.exists) {
         final company = companyDoc.data() as Company;
         final invite = Invite(
             companyEmail: companyEmail,
             cid: cid,
-            uid: uid!,
+            uid: address,
             inviteId: docRef.id,
             creationTimestamp: Timestamp.now(),
             actionTimestamp: null,
             status: InviteStatus.pending,
             companyData: company.getCompanySummary(),
             employeeData: EmployeeSummary(
-              uid: uid!,
+              uid: address,
               name: (await getUser())!.name,
               email: companyEmail,
               eid: eid,
@@ -276,19 +285,19 @@ class FirestoreFunctions {
     final email =
         Email([personalization], fromAddress, subject, content: [content]);
     mailer.send(email).then((result) {
-      print(result);
     }).catchError((onError) {
-      print('error');
+      // print(onError);
     });
   }
 
   // function to accept an invite
   Future<void> acceptInvite(Invite invite) async {
-    if (uid == null) return;
-    await firestore.runTransaction((transaction) async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
+    await _firestore.runTransaction((transaction) async {
       final inviteDoc =
           await transaction.get(Invite.collection.doc(invite.inviteId));
-      final userDoc = await transaction.get(AppUser.collection.doc(uid));
+      final userDoc = await transaction.get(AppUser.collection.doc(address));
       if (userDoc.exists && inviteDoc.exists) {
         final invite = inviteDoc.data() as Invite;
         transaction.update(Invite.collection.doc(invite.inviteId), {
@@ -296,13 +305,13 @@ class FirestoreFunctions {
           'actionTimestamp': Timestamp.now()
         });
         if (userDoc.data()!.companies.contains(invite.cid)) return;
-        transaction.update(AppUser.collection.doc(uid), {
+        transaction.update(AppUser.collection.doc(address), {
           'companies': FieldValue.arrayUnion([invite.cid]),
           'companyData.${invite.cid}': invite.companyData.toFirestore(),
         });
         transaction.update(Company.collection.doc(invite.cid), {
-          'users': FieldValue.arrayUnion([uid]),
-          'empData.$uid': invite.employeeData.toFirestore(),
+          'users': FieldValue.arrayUnion([address]),
+          'empData.$address': invite.employeeData.toFirestore(),
         });
       } else {
         throw Exception('Invite does not exist');
@@ -312,7 +321,8 @@ class FirestoreFunctions {
 
   // function to decline an invite
   Future<void> declineInvite(String inviteId) async {
-    if (uid == null) return;
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     await Invite.collection.doc(inviteId).update({
       'status': InviteStatus.rejected.name,
       'actionTimestamp': Timestamp.now()
@@ -321,8 +331,10 @@ class FirestoreFunctions {
 
   // function to get all invites from the collection invites where the company email is equal to the given company email
   Future<List<Invite>> getMyInvites() async {
+    String? address = await ContractService.getAddress();
+    if (address == null) throw Exception('Address is null');
     List<Invite> invites = [];
-    var snapshot = await Invite.collection.where('uid', isEqualTo: uid).get();
+    var snapshot = await Invite.collection.where('uid', isEqualTo: address).get();
     for (var doc in snapshot.docs) {
       invites.add(Invite.fromFirestore(
           doc as DocumentSnapshot<Map<String, dynamic>>, null));

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -89,21 +88,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String walletAddress = "";
   initFunction() async {
     try {
-      ContractService contractService = await ContractService.build();
       //get wallet address
-      EthPrivateKey? wallet = await contractService.getOrGenerateWallet();
-      walletAddress = wallet!.address.hex;
+      String? address = await ContractService.getAddress();
+      walletAddress = address!;
       setState(() {
         walletAddress;
       });
-      AppState().address = walletAddress;
 
       // get balance
-      EtherAmount am = await contractService.getBalance();
+      EtherAmount am = await ContractService.getBalance();
       balance = am.getValueInUnit(EtherUnit.ether);
       setState(() {
         balance;
-        walletAddress;
       });
     } catch (e) {
       print("homescreen_error: ${e.toString()}");

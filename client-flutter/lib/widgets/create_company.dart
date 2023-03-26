@@ -1,8 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:voting_app/services/app_state.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 
 import '../objects/Company.dart';
@@ -18,6 +15,8 @@ class _CreateCompanyState extends State<CreateCompany> {
   bool _isLoading = false;
   TextEditingController _nameController = TextEditingController();
   TextEditingController _cinController = TextEditingController();
+  TextEditingController _eidController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,6 +47,14 @@ class _CreateCompanyState extends State<CreateCompany> {
                             hintText: "Company Identification No. (Optional)"),
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: TextFormField(
+                        controller: _eidController,
+                        decoration: const InputDecoration(
+                            hintText: "Your Employee Id"),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -62,11 +69,21 @@ class _CreateCompanyState extends State<CreateCompany> {
                           child: CircularProgressIndicator(color: Colors.white))
                       : Text("Add Company"),
                   onPressed: () async {
+                    if(_nameController.text.isEmpty){
+                      Get.snackbar("Error", "Company Name cannot be empty");
+                      return;
+                    }
+
+                    if(_eidController.text.isEmpty){
+                      Get.snackbar("Error", "Employee Id cannot be empty");
+                      return;
+                    }
+
                     setState(() {
                       _isLoading = true;
                     });
                     try{
-                      await FirestoreFunctions().createCompany(_cinController.text, _nameController.text, '');
+                      await FirestoreFunctions().createCompany(_cinController.text, _nameController.text, _eidController.text);
                       setState(() {
                         _isLoading = false;
                       });

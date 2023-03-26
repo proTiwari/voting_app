@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/objects/Company.dart';
 import 'package:voting_app/objects/EmployeeSummary.dart';
+import 'package:voting_app/services/app_state.dart';
 
 import '../flutterflow/flutter_flow_theme.dart';
 import '../objects/ElectionEvent.dart';
@@ -58,7 +58,7 @@ class _CompanyEventsState extends State<CompanyEvents> {
           ),
         ),
       ),
-      floatingActionButton: widget.company.admin == FirebaseAuth.instance.currentUser!.uid ? FloatingActionButton(
+      floatingActionButton: widget.company.admin == AppState().address ? FloatingActionButton(
         onPressed: () {
           // create event
           Get.to(CreateEvent(company: widget.company));
