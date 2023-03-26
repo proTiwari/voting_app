@@ -236,10 +236,7 @@ class FirestoreFunctions {
     String? address = await ContractService.getAddress();
     if (address == null) throw Exception('Address is null');
     final docRef = Invite.collection.doc();
-    var referCode = await CodeGenerator().generateCode('refer', docRef.id);
-
-    var inviteLink =
-    await DeepLinkService.instance?.createReferLink(referCode, "");
+    Uri inviteDynamicLink = await DeepLinkService.createInviteDeepLink(docRef.id);
 
     // run transaction and get company data
     final invitation =
@@ -269,7 +266,7 @@ class FirestoreFunctions {
       }
     });
 
-    print("invitelink: ee ${inviteLink}");
+    print("invitelink: ee ${inviteDynamicLink.toString()}");
 
     // send email with sendgrid_mailer library
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
@@ -278,7 +275,7 @@ class FirestoreFunctions {
     final content = Content(
         'text/plain',
         'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
-            '$inviteLink');
+            '$inviteDynamicLink');
     final subject =
         'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);

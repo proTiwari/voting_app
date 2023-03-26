@@ -1,7 +1,10 @@
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/screens/create_user_screen.dart';
 import 'package:voting_app/screens/import_or_create_wallet_screen.dart';
+import 'package:voting_app/screens/invitation_action_screen.dart';
+import 'package:voting_app/services/deeplink_service.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -11,7 +14,9 @@ import '../services/contract_service.dart';
 import '../widgets/bottom_nav_bar.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  String? inviteId;
+
+  SplashScreen({inviteId, super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -27,20 +32,27 @@ class _SplashScreenState extends State<SplashScreen> {
 
   initFunction() async {
     try {
+
       //get wallet address
       EthPrivateKey? wallet = await ContractService.getWallet();
       if(wallet == null){
-        Get.to(ImportOrCreateWalletScreen());
+        Get.to(ImportOrCreateWalletScreen(inviteId: widget.inviteId));
       }
       else {
         AppUser? user = await FirestoreFunctions().getUser();
         if (user == null) {
-          Get.to(CreateUserScreen());
+          Get.to(CreateUserScreen(inviteId: widget.inviteId,));
         } else {
           AppState().name = user.name;
           AppState().email = user.email;
           AppState().address = wallet.address.hex;
-          Get.to(CustomBottomNavigation());
+          if(widget.inviteId != null){
+            Get.to(InvitationActionScreen(widget.inviteId!));
+          }
+          else {
+            Get.to(CustomBottomNavigation());
+          }
+
         }
       }
     } catch (e) {

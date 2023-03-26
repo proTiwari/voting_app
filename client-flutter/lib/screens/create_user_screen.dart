@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:voting_app/screens/invitation_action_screen.dart';
 import 'package:voting_app/services/app_state.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import 'package:voting_app/widgets/bottom_nav_bar.dart';
@@ -8,7 +9,9 @@ import '../objects/AppUser.dart';
 import '../widgets/input_field.dart';
 
 class CreateUserScreen extends StatefulWidget {
-  const CreateUserScreen({super.key});
+  String? inviteId;
+
+  CreateUserScreen({inviteId, super.key});
 
   @override
   State<CreateUserScreen> createState() => _CreateUserScreenState();
@@ -80,7 +83,12 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       final user = await createUser();
                       AppState().name = user.name;
                       AppState().email = user.email;
-                      Get.to(CustomBottomNavigation());
+                      if(widget.inviteId != null) {
+                        Get.to(InvitationActionScreen(widget.inviteId!));
+                      }
+                      else {
+                        Get.to(CustomBottomNavigation());
+                      }
                     } catch (e) {
                       const snackBar = SnackBar(content: Text('Something went wrong! Please check connection and try again.'));
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);

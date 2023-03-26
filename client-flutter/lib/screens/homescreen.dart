@@ -9,15 +9,12 @@ import 'package:voting_app/services/app_state.dart';
 import 'package:web3dart/credentials.dart';
 import 'package:web3dart/web3dart.dart';
 import '../flutterflow/flutter_flow_theme.dart';
-import '../objects/ElectionEvent.dart';
-import '../objects/PollEvent.dart';
 import '../services/code_generator.dart';
 import 'package:flutter_share/flutter_share.dart';
 import '../services/deeplink_service.dart';
 import '../services/contract_service.dart';
 import '../services/firestore_functions.dart';
 import '../widgets/events_card.dart';
-import 'event_details.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -34,21 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     // TODO: implement initState
     super.initState();
     initFunction();
-    deeplink();
-    getdynamiclink();
     refresh();
-  }
-
-  getdynamiclink() async {
-    print("getdynamiclink");
-    print(dynamiclink);
-    if (dynamiclink.toString() != '') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => InvitationActionScreen(dynamiclink.toString())),
-      );
-    }
   }
 
   List activeEvents = [];
@@ -76,31 +59,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _isLoading = false;
       });
-    }
-  }
-
-  String? referLink = '';
-  void deeplink() async {
-    try {
-      final deepLinkRepo = await DeepLinkService.instance;
-      var referralCode = await deepLinkRepo?.referrerCode.value;
-      print(
-          "sddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd ${referralCode}");
-
-      //link for joining event
-      var id = "";
-
-      final referCode =
-          await CodeGenerator().generateCode('refer', id.toString());
-
-      referLink =
-          await DeepLinkService.instance?.createReferLink(referCode, "");
-
-      setState(() {
-        referLink;
-      });
-    } catch (e) {
-      print("$e");
     }
   }
 
@@ -262,18 +220,5 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> share() async {
-    print("sdfwe3");
-    try {
-      await FlutterShare.share(
-          title: 'E-Voting App',
-          text: 'completely secure blockchain voting platform',
-          linkUrl: '$referLink',
-          chooserTitle: '');
-    } catch (e) {
-      print(e);
-    }
   }
 }

@@ -13,7 +13,9 @@ import '../widgets/bottom_nav_bar.dart';
 import 'create_user_screen.dart';
 
 class ImportOrCreateWalletScreen extends StatefulWidget {
-  const ImportOrCreateWalletScreen({super.key});
+  String? inviteId;
+
+  ImportOrCreateWalletScreen({inviteId, super.key});
 
   @override
   State<ImportOrCreateWalletScreen> createState() => _ImportOrCreateWalletScreenState();

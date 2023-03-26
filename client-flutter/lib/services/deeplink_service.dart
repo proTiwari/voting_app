@@ -2,7 +2,9 @@
 
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
-import 'package:voting_app/globals.dart';
+import 'package:voting_app/globals.dart' as globals;
+import 'package:get/get.dart';
+import '../screens/invitation_action_screen.dart';
 
 class DeepLinkService {
   DeepLinkService._();
@@ -22,13 +24,10 @@ class DeepLinkService {
   handleDynamicLinks() async {
     //Get initial dynamic link if app is started using the link
     final data = await dynamicLink.getInitialLink();
-    print("sdfffffffffffffffasdjfaaaaaaaaaaaaaaaaaaaaaaaaaaaanull: ${data}");
     if (data != null) {
-      print("sdfffffffffffffffasdjfaaaaaaaaaaaaaaaaaaaaaaaaaaaa ${data.link}");
       try {
-        dynamiclink = data.link.toString().split("%22")[1].split('refer-')[1];
+        globals.dynamiclink = data.link.toString().split("%22")[1].split('refer-')[1];
 
-        print("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuu: {dynamicLink}");
       } catch (e) {
         return null;
       }
@@ -65,13 +64,40 @@ class DeepLinkService {
       ),
     );
 
-    final shortLink = await dynamicLink.buildShortLink(dynamicLinkParameters);
+    final shortLink = await dynamicLink.buildLink(dynamicLinkParameters);
 
-    return shortLink.shortUrl.toString();
+    return shortLink.toString();
   }
 
   _handleDeepLink(PendingDynamicLinkData data) async {
     dynamicLink = data.link as FirebaseDynamicLinks;
     return dynamicLink;
+  }
+
+  static Future<String?> checkForInviteId(PendingDynamicLinkData? data) async {
+    print('dynamic link data: ${data?.link}');
+    if (data != null) {
+      try {
+        if(data.link.path == '/invite') {
+          return data.link.queryParameters['inviteId'];
+        }
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  static Future<Uri> createInviteDeepLink(String inviteId) async {
+    final DynamicLinkParameters parameters = DynamicLinkParameters(
+      uriPrefix: 'https://evotingapp.page.link',
+      link: Uri.parse('https://bvoting.pucosa.com/invite?inviteId=$inviteId'),
+      androidParameters: const AndroidParameters(
+        packageName: 'com.pucosa.bvoting',
+      ),
+    );
+
+    final Uri dynamicUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
+    return dynamicUrl;
   }
 }
