@@ -34,14 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     initFunction();
     deeplink();
+    getdynamiclink();
     refresh();
   }
 
   getdynamiclink() async {
-    if (dynamiclink != '') {
+    print("getdynamiclink");
+    print(dynamiclink);
+    if (dynamiclink.toString() != '') {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => InvitationActionScreen('kklk')),
+        MaterialPageRoute(
+            builder: (context) => InvitationActionScreen(dynamiclink.toString())),
       );
     }
   }
@@ -114,36 +118,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: const Text("Exit"),
-                content: const Text("Are you sure you want to Exit?"),
-                actions: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(
-                      Icons.cancel,
-                      color: Colors.red,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () async {
-                      exit(0);
-                    },
-                    icon: const Icon(
-                      Icons.done,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              );
-            });
-        return false;
+        // showDialog(
+        //     barrierDismissible: false,
+        //     context: context,
+        //     builder: (context) {
+        //       return AlertDialog(
+        //         title: const Text("Exit"),
+        //         content: const Text("Are you sure you want to Exit?"),
+        //         actions: [
+        //           IconButton(
+        //             onPressed: () {
+        //               Navigator.pop(context);
+        //             },
+        //             icon: const Icon(
+        //               Icons.cancel,
+        //               color: Colors.red,
+        //             ),
+        //           ),
+        //           IconButton(
+        //             onPressed: () async {
+        //               exit(0);
+        //             },
+        //             icon: const Icon(
+        //               Icons.done,
+        //               color: Colors.green,
+        //             ),
+        //           ),
+        //         ],
+        //       );
+        //     });
+        return true;
       },
       child: SafeArea(
         child: Scaffold(
@@ -171,82 +175,77 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: FlutterFlowTheme.of(context).cardBackgroundColor,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Expanded(
-                            flex: 1,
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'Ethereum Wallet',
-                                        style: FlutterFlowTheme.of(context)
-                                            .bodyText1
-                                            .override(
-                                              fontFamily: 'Urbanist',
-                                              color:
-                                                  FlutterFlowTheme.of(context)
-                                                      .cardTextColor,
-                                              fontSize: 25,
-                                              fontWeight: FontWeight.w600,
-                                            ),
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Ethereum Wallet',
+                                      style: FlutterFlowTheme.of(context)
+                                          .bodyText1
+                                          .override(
+                                            fontFamily: 'Urbanist',
+                                            color: FlutterFlowTheme.of(context)
+                                                .cardTextColor,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                    ),
+                                    Icon(Icons.copy),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  AppState().address,
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyText1
+                                      .override(
+                                        fontFamily: 'Urbanist',
+                                        color: FlutterFlowTheme.of(context)
+                                            .cardTextColor,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      Icon(Icons.copy),
-                                    ],
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(
-                                    AppState().address,
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyText1
-                                        .override(
-                                          fontFamily: 'Urbanist',
-                                          color: FlutterFlowTheme.of(context)
-                                              .cardTextColor,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                  SizedBox(height: 6),
-                                  Text(
-                                    '$balance  ETH',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyText1
-                                        .override(
-                                          fontFamily: 'Urbanist',
-                                          color: FlutterFlowTheme.of(context)
-                                              .cardTextColor,
-                                          fontSize: 34,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  '$balance  ETH',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyText1
+                                      .override(
+                                        fontFamily: 'Urbanist',
+                                        color: FlutterFlowTheme.of(context)
+                                            .cardTextColor,
+                                        fontSize: 34,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       ),
                     ),
-                SizedBox(height: 20),
-                Text(
-                  'Active Events',
-                  style: FlutterFlowTheme.of(context).bodyText1.override(
-                        fontFamily: 'Urbanist',
-                        color: FlutterFlowTheme.of(context).darkBGstatic,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                //event card
-                EventCard(
-                  activeEvents: activeEvents,
-                ),
-              ]),
-
+                    SizedBox(height: 20),
+                    Text(
+                      'Active Events',
+                      style: FlutterFlowTheme.of(context).bodyText1.override(
+                            fontFamily: 'Urbanist',
+                            color: FlutterFlowTheme.of(context).darkBGstatic,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    //event card
+                    EventCard(
+                      activeEvents: activeEvents,
+                    ),
+                  ]),
             ),
           ),
         ),

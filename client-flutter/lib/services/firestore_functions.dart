@@ -227,6 +227,10 @@ class FirestoreFunctions {
   Future<void> inviteUser(String companyEmail, String cid, String eid) async {
     if (uid == null) return;
     final docRef = Invite.collection.doc();
+    var referCode = await CodeGenerator().generateCode('refer', docRef.id);
+
+    var inviteLink =
+        await DeepLinkService.instance?.createReferLink(referCode, "");
 
     // run transaction and get company data
     final invitation =
@@ -256,16 +260,13 @@ class FirestoreFunctions {
       }
     });
 
-    final referCode =
-        await CodeGenerator().generateCode('refer', invitation.inviteId);
-
-    final inviteLink = await DeepLinkService.instance?.createReferLink(referCode, "");
+    print("invitelink: ee ${inviteLink}");
 
     // send email with sendgrid_mailer library
     final mailer = Mailer(dotenv.env['SENDGRID_API_KEY']!);
     final toAddress = Address(invitation.companyEmail);
     const fromAddress = Address('proshubham5@gmail.com');
-    final content = Content(
+    final content = await Content(
         'text/plain',
         'You have been invited to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''} on the app. Click the link below to accept the invite. \n\n'
             '$inviteLink');
@@ -273,9 +274,9 @@ class FirestoreFunctions {
         'Invite to join a company ${invitation.companyData.name} ${invitation.companyData.cin.isNotEmpty ? '(${invitation.companyData.cin})' : ''}';
     final personalization = Personalization([toAddress]);
 
-    final email =
-        Email([personalization], fromAddress, subject, content: [content]);
-    mailer.send(email).then((result) {
+    final email = await Email([personalization], fromAddress, subject,
+        content: [content]);
+    await mailer.send(email).then((result) {
       print(result);
     }).catchError((onError) {
       print('error');
@@ -342,7 +343,8 @@ class FirestoreFunctions {
     return snapshot.data()!.empData.values.toList();
   }
 
-  Future<List<EmployeeSummary>> getElectionEventCandidatesData(ElectionEvent event) async {
+  Future<List<EmployeeSummary>> getElectionEventCandidatesData(
+      ElectionEvent event) async {
     var snapshot = await Company.collection.doc(event.cid).get();
     List<EmployeeSummary> candidates = [];
     for (var candidate in event.candidates) {

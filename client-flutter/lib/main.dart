@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:voting_app/constants.keys.dart';
 import 'package:voting_app/screens/homescreen.dart';
 import 'package:voting_app/screens/email_screen.dart';
+import 'package:voting_app/screens/invitation_action_screen.dart';
 import 'package:voting_app/screens/splashscreen.dart';
 import 'package:voting_app/services/deeplink_service.dart';
 import 'services/app_state.dart';
@@ -27,8 +28,14 @@ Future<void> main() async {
   ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
