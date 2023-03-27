@@ -73,11 +73,11 @@ class _ImportOrCreateWalletScreenState extends State<ImportOrCreateWalletScreen>
                       ),
                     );
                     if(user == null)
-                      Get.to(CreateUserScreen());
+                      Get.to(CreateUserScreen(inviteId: widget.inviteId,));
                     else {
                       AppState().name = user.name;
                       AppState().email = user.email;
-                      Get.to(CustomBottomNavigation());
+                      Get.to(CustomBottomNavigation(inviteId: widget.inviteId));
                     }
                   }
                   else {
@@ -118,7 +118,7 @@ class _ImportOrCreateWalletScreenState extends State<ImportOrCreateWalletScreen>
                           content: Text('New Wallet created!'),
                         ),
                       );
-                      Get.to(CreateUserScreen());
+                      Get.to(CreateUserScreen(inviteId: widget.inviteId,));
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(

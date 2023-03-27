@@ -29,6 +29,13 @@
             {
               "client_id": "657952523892-5s4mdf2nh7i20vga2b63vci1l3cd5mm8.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "657952523892-rknce492kpp5edj7u3panmo0gr5l72q2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.votingApp"
+              }
             }
           ]
         }
@@ -42,6 +49,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "657952523892-77ncgn1433jhsu24m92q5qdm8tmqin41.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pucosa.bvoting",
+            "certificate_hash": "70b40f7f1ed0bfb201430a3267f167c37d1d437f"
+          }
+        },
         {
           "client_id": "657952523892-escde8an01djs1l6cg4v1c819o0u0512.apps.googleusercontent.com",
           "client_type": 1,
@@ -66,6 +81,13 @@
             {
               "client_id": "657952523892-5s4mdf2nh7i20vga2b63vci1l3cd5mm8.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "657952523892-rknce492kpp5edj7u3panmo0gr5l72q2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.votingApp"
+              }
             }
           ]
         }

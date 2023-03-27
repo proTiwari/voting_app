@@ -83,12 +83,8 @@ class _CreateUserScreenState extends State<CreateUserScreen> {
                       final user = await createUser();
                       AppState().name = user.name;
                       AppState().email = user.email;
-                      if(widget.inviteId != null) {
-                        Get.to(InvitationActionScreen(widget.inviteId!));
-                      }
-                      else {
-                        Get.to(CustomBottomNavigation());
-                      }
+                      Get.to(CustomBottomNavigation(inviteId: widget.inviteId,));
+
                     } catch (e) {
                       const snackBar = SnackBar(content: Text('Something went wrong! Please check connection and try again.'));
                       ScaffoldMessenger.of(context).showSnackBar(snackBar);

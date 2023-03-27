@@ -3,8 +3,6 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
 import 'package:voting_app/globals.dart' as globals;
-import 'package:get/get.dart';
-import '../screens/invitation_action_screen.dart';
 
 class DeepLinkService {
   DeepLinkService._();
@@ -97,7 +95,7 @@ class DeepLinkService {
       ),
     );
 
-    final Uri dynamicUrl = await FirebaseDynamicLinks.instance.buildLink(parameters);
-    return dynamicUrl;
+    final ShortDynamicLink dynamicUrl = await FirebaseDynamicLinks.instance.buildShortLink(parameters);
+    return dynamicUrl.shortUrl;
   }
 }

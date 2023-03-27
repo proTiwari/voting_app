@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -10,16 +9,19 @@ import 'package:provider/provider.dart';
 import 'package:voting_app/screens/invitation_action_screen.dart';
 import 'package:voting_app/screens/splashscreen.dart';
 import 'package:voting_app/services/deeplink_service.dart';
+import 'firebase_options.dart';
 import 'services/app_state.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
   final appState = AppState();
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  final app = await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  final data = await FirebaseDynamicLinks.instance.getInitialLink();
+  final data = await FirebaseDynamicLinksPlatform.instanceFor(app: app).getInitialLink();
   final inviteId = await DeepLinkService.checkForInviteId(data);
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -55,13 +57,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Timer? _timerLink;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {

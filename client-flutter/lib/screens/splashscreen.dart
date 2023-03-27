@@ -46,13 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
           AppState().name = user.name;
           AppState().email = user.email;
           AppState().address = wallet.address.hex;
-          if(widget.inviteId != null){
-            Get.to(InvitationActionScreen(widget.inviteId!));
-          }
-          else {
-            Get.to(CustomBottomNavigation());
-          }
-
+          Get.to(CustomBottomNavigation(inviteId: widget.inviteId));
         }
       }
     } catch (e) {
