@@ -15,7 +15,7 @@ import 'create_user_screen.dart';
 class ImportOrCreateWalletScreen extends StatefulWidget {
   String? inviteId;
 
-  ImportOrCreateWalletScreen({inviteId, super.key});
+  ImportOrCreateWalletScreen({this.inviteId, super.key});
 
   @override
   State<ImportOrCreateWalletScreen> createState() => _ImportOrCreateWalletScreenState();

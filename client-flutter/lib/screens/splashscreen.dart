@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:voting_app/screens/create_user_screen.dart';
 import 'package:voting_app/screens/import_or_create_wallet_screen.dart';
-import 'package:voting_app/screens/invitation_action_screen.dart';
-import 'package:voting_app/services/deeplink_service.dart';
 import 'package:voting_app/services/firestore_functions.dart';
 import 'package:web3dart/web3dart.dart';
 
@@ -12,11 +10,12 @@ import '../objects/AppUser.dart';
 import '../services/app_state.dart';
 import '../services/contract_service.dart';
 import '../widgets/bottom_nav_bar.dart';
+import 'package:logging/logging.dart';
 
 class SplashScreen extends StatefulWidget {
   String? inviteId;
 
-  SplashScreen({inviteId, super.key});
+  SplashScreen({this.inviteId, super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -27,6 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    final Logger log = Logger("BVoting Log");
+    log.info('inviteId in splash screen ${widget.inviteId}');
     initFunction();
   }
 
@@ -65,6 +66,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Container(
         color: Colors.white,
         child:Center(child: Image.asset("assets/voting.png"),)
+        //child: Center(child: Text(widget.inviteId ?? 'Null')),
       ),
     );
   }

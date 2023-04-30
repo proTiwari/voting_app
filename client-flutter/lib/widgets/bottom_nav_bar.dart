@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,10 +8,12 @@ import 'package:voting_app/screens/me.dart';
 import 'package:get/get.dart';
 
 import '../screens/invitation_action_screen.dart';
+import 'package:logging/logging.dart';
 
 class CustomBottomNavigation extends StatefulWidget {
   String? inviteId;
-  CustomBottomNavigation({inviteId, super.key});
+  CustomBottomNavigation({this.inviteId, super.key});
+
 
   @override
   State<CustomBottomNavigation> createState() => _CustomBottomNavigationState();
@@ -18,14 +21,16 @@ class CustomBottomNavigation extends StatefulWidget {
 
 class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
   late int currentPageIndex = 0;
+  final Logger log = Logger("BVoting Log");
 
   final pages = [HomeScreen(), Companies(), Me()];
 
   @override
   void initState() {
     super.initState();
-    print("init state called: ${widget.inviteId}");
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    log.info("init state called: ${widget.inviteId}");
+    Timer.run(() {
+      log.info('in add post callback with inviteId ${widget.inviteId}');
       if(widget.inviteId != null){
         Get.to(InvitationActionScreen(widget.inviteId!));
       }

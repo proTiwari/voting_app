@@ -11,7 +11,7 @@ import '../widgets/input_field.dart';
 class CreateUserScreen extends StatefulWidget {
   String? inviteId;
 
-  CreateUserScreen({inviteId, super.key});
+  CreateUserScreen({this.inviteId, super.key});
 
   @override
   State<CreateUserScreen> createState() => _CreateUserScreenState();

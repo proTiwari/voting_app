@@ -12,8 +12,13 @@ import 'package:voting_app/services/deeplink_service.dart';
 import 'firebase_options.dart';
 import 'services/app_state.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:logging_to_logcat/logging_to_logcat.dart';
+import 'package:logging/logging.dart';
 
 Future<void> main() async {
+  Logger.root.activateLogcat();
+  final Logger log = Logger("BVoting Log");
+
   await dotenv.load(fileName: ".env");
   final appState = AppState();
   final widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +28,8 @@ Future<void> main() async {
 
   final data = await FirebaseDynamicLinksPlatform.instanceFor(app: app).getInitialLink();
   final inviteId = await DeepLinkService.checkForInviteId(data);
+  log.info(inviteId.toString());
+  log.info(data.toString());
 
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     systemNavigationBarColor: Color(0xFFFFFFFF),
@@ -50,7 +57,7 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   String? inviteId;
 
-  MyApp({inviteId, super.key});
+  MyApp({this.inviteId, super.key});
 
   @override
   State<MyApp> createState() => _MyAppState();
